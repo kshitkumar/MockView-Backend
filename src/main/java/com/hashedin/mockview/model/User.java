@@ -29,6 +29,7 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(unique = true)

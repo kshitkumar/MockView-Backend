@@ -24,12 +24,14 @@ public class UserWorkExperience {
     private String companyName;
     private String industry;
     private String role;
+    private String position;
     private String responsibility;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date joiningDate;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endingDate;
-    private String currentEmployment;
+    @Column(nullable = false, columnDefinition = "TINYINT", length = 1)
+    private Boolean currentEmployment;
 
 }

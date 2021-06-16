@@ -1,6 +1,7 @@
 package com.hashedin.mockview.service;
 
 import com.hashedin.mockview.dto.UserEducationRequest;
+import com.hashedin.mockview.dto.UserExperienceRequest;
 import com.hashedin.mockview.dto.UserInputRequest;
 import com.hashedin.mockview.model.*;
 import com.hashedin.mockview.repository.*;
@@ -23,6 +24,8 @@ public class UserService {
     UserProfileRepository userProfileRepository;
     @Autowired
     UserEducationRepository userEducationRepository;
+    @Autowired
+    UserWorkExperienceRepository userWorkExperienceRepository;
 
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -118,6 +121,44 @@ public class UserService {
 
        return new ResponseEntity(user.getId(),HttpStatus.OK);
 
+
+    }
+    public ResponseEntity addUserExperienceDetails(Integer id, UserExperienceRequest userExperienceRequest)
+    {
+        logger.debug("Entering addUserExperienceDetails");
+        User user = userRepository.findById(id).get();
+        if(user == null)
+        {
+            logger.debug("User details corresponding to User Id {} not found",id);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        try
+        {
+            UserWorkExperience userWorkExperience =new UserWorkExperience();
+            List<UserWorkExperience> inputUserWorkExperienceList = userExperienceRequest.getUserWorkExperienceList();
+            List<UserWorkExperience> userWorkExperienceList = inputUserWorkExperienceList.stream()
+                    .map(x->x.builder()
+                    .companyName(x.getCompanyName())
+                    .currentEmployment(x.getCurrentEmployment())
+                    .endingDate(x.getEndingDate())
+                    .industry(x.getIndustry())
+                    .user(user)
+                    .joiningDate(x.getJoiningDate())
+                    .responsibility(x.getResponsibility())
+                    .role(x.getRole())
+                    .position(x.getPosition())
+                    .build())
+                    .collect(Collectors.toList());
+            userWorkExperienceRepository.saveAll(userWorkExperienceList);
+            logger.debug("User id {} experience details successfully inserted in database ",id);
+            return new ResponseEntity(user.getId(),HttpStatus.OK);
+
+        }
+        catch(Exception exception) {
+            logger.error("Exception occured" + exception.toString());
+            exception.printStackTrace();
+        }
+        return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 
     }
 
