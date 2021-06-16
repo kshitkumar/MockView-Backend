@@ -1,5 +1,6 @@
 package com.hashedin.mockview.controller;
 
+import com.hashedin.mockview.dto.UserEducationRequest;
 import com.hashedin.mockview.dto.UserInputRequest;
 import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.model.UserProfile;
@@ -13,25 +14,31 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class UserController {
 
-    private static final Logger logger= LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     UserService userService;
+
     @PostMapping("/user")
     public ResponseEntity createUser(@RequestBody User user) {
-        logger.debug("Input User object is {}",user);
-       return userService.userSignUp(user);
+        logger.debug("Input User object is {}", user);
+        return userService.userSignUp(user);
 
     }
+
     @GetMapping("/user")
-    public ResponseEntity loginUser(@RequestBody UserInputRequest userInputRequest)
-    {
-       return  userService.loginUser(userInputRequest);
+    public ResponseEntity loginUser(@RequestBody UserInputRequest userInputRequest) {
+        return userService.loginUser(userInputRequest);
     }
+
     @PostMapping("/user/details/{id}")
-    public ResponseEntity updateDetails(@PathVariable int id, @RequestBody UserProfile userProfile)
+    public ResponseEntity addDetails(@PathVariable int id, @RequestBody UserProfile userProfile) {
+        return userService.addUserDetails(id, userProfile);
+    }
+    @PostMapping("/user/details/education/{id}")
+    public ResponseEntity addEducationDetails(@PathVariable Integer id,@RequestBody UserEducationRequest userEducationRequest)
     {
-        return userService.updateUserDetails(id,userProfile);
+        return userService.addEducationDetails(id,userEducationRequest);
     }
 
 

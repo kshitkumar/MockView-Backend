@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hashedin.mockview.dto.Gender;
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.Date;
+import java.sql.Date;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -39,9 +38,12 @@ public class User {
     private String password;
 
     @Size(min = 10, max = 10)
-    @Column(length = 10)
+    @Column(length = 10,unique = true)
     private String phoneNumber;
 
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private UserProfile userProfile;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<UserWorkExperience> userWorkExperience;
 }

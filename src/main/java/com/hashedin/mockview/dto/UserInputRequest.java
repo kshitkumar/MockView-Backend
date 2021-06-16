@@ -11,4 +11,5 @@ public class UserInputRequest {
     private String emailId;
     private String phoneNumber;
     private String password;
+
 }
