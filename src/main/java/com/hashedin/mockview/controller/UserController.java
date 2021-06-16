@@ -3,6 +3,7 @@ package com.hashedin.mockview.controller;
 import com.hashedin.mockview.dto.UserEducationRequest;
 import com.hashedin.mockview.dto.UserExperienceRequest;
 import com.hashedin.mockview.dto.UserInputRequest;
+import com.hashedin.mockview.dto.UserSkillRequest;
 import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.model.UserProfile;
 import com.hashedin.mockview.service.UserService;
@@ -44,6 +45,11 @@ public class UserController {
     @PostMapping("/user/details/experience/{id}")
     public ResponseEntity addExperienceDetails(@PathVariable Integer id, @RequestBody UserExperienceRequest userExperienceRequest) {
         return userService.addUserExperienceDetails(id,userExperienceRequest);
+    }
+    @PostMapping("/user/details/skill/{id}")
+    public ResponseEntity addUserSkill(@PathVariable Integer id, @RequestBody UserSkillRequest userSkillRequest)
+    {
+        return userService.addUserSkills(id,userSkillRequest);
     }
 
 
