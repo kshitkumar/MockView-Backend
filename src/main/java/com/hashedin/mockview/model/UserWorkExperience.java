@@ -28,6 +28,7 @@ public class UserWorkExperience {
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date joiningDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endingDate;
     private String currentEmployment;
 

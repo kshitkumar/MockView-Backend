@@ -1,6 +1,7 @@
 package com.hashedin.mockview.model;
 
 
+import com.hashedin.mockview.dto.EducationCategory;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,15 +20,21 @@ public class UserEducation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn
     private User user;
 
-    @OneToMany(mappedBy = "userEducation",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<UserSchoolEducation> userSchoolEducation;
+    private String degreeName;
+    private String stream;
+    private int marks;
+    private int year;
+    private String schoolName;
+    private String country;
 
-    @OneToMany(mappedBy = "userEducation",fetch = FetchType.LAZY,cascade = CascadeType.ALL)
-    private List<UserUniversityEducation> userUniversityEducations;
+    @Enumerated(EnumType.STRING)
+    private EducationCategory educationCategory;
+
+
 
 
 

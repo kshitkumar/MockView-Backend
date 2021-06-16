@@ -1,6 +1,5 @@
 package com.hashedin.mockview.service;
 
-import com.hashedin.mockview.controller.UserController;
 import com.hashedin.mockview.dto.UserEducationRequest;
 import com.hashedin.mockview.dto.UserInputRequest;
 import com.hashedin.mockview.model.*;
@@ -24,10 +23,7 @@ public class UserService {
     UserProfileRepository userProfileRepository;
     @Autowired
     UserEducationRepository userEducationRepository;
-    @Autowired
-    UserSchoolEducationRepository userSchoolEducationRepository;
-    @Autowired
-    UserUniversityEducationRepository userUniversityEducationRepository;
+
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -99,51 +95,28 @@ public class UserService {
 
         logger.debug("Entering addEducationDetails method");
         if (id == null) {
-            logger.debug("UserId not found in Inout request");
+            logger.debug("UserId not found in Input request");
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
-        try {
             User user = userRepository.findById(id).get();
-            List<UserSchoolEducation> inputUserSchoolEducationList = userEducationRequest.getUserSchoolEducationsList();
-            List<UserUniversityEducation> inputUserUniversityEducationList = userEducationRequest.getUserUniversityEducationList();
+            List<UserEducation> inputUserEducationList = userEducationRequest.getUserEducationList();
 
-            UserEducation userEducation = UserEducation.builder()
-                    .user(user)
-                    .build();
-            List<UserSchoolEducation> userSchoolEducationList = inputUserSchoolEducationList.stream().map(x -> x.builder()
-                    .className(x.getClassName())
-                    .userEducation(userEducation)
-                    .country(x.getCountry())
+            List<UserEducation> userEducationList = inputUserEducationList.stream().map(x -> x.builder()
+                    .degreeName(x.getDegreeName())
+                    .stream(x.getStream())
                     .marks(x.getMarks())
                     .year(x.getYear())
                     .schoolName(x.getSchoolName())
+                    .country(x.getCountry())
+                    .educationCategory(x.getEducationCategory())
+                    .user(user)
                     .build()).collect(Collectors.toList());
-            List<UserUniversityEducation> userUniversityEducationList = inputUserUniversityEducationList.stream()
-                    .map(x -> x.builder()
-                            .userEducation(userEducation)
-                            .cgpa(x.getCgpa())
-                            .country(x.getCountry())
-                            .degreeName(x.getDegreeName())
-                            .universityName(x.getUniversityName())
-                            .yearOfGraduation(x.getYearOfGraduation())
-                            .stream(x.getStream())
-                            .build()
-                    ).collect(Collectors.toList());
 
 
-            userEducation.setUserSchoolEducation(userSchoolEducationList);
-            userEducation.setUserUniversityEducations(userUniversityEducationList);
-            userEducationRepository.save(userEducation);
 
-        }
-        catch(Exception ex)
-        {
-            logger.error("Error while saving User Education details");
-            logger.debug(ex.toString());
-            ex.printStackTrace();
-            return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity(id, HttpStatus.OK);
+            userEducationRepository.saveAll(userEducationList);
+
+       return new ResponseEntity(user.getId(),HttpStatus.OK);
 
 
     }

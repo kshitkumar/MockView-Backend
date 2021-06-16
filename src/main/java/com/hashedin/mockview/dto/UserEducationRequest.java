@@ -1,13 +1,7 @@
 package com.hashedin.mockview.dto;
 
 import com.hashedin.mockview.model.UserEducation;
-import com.hashedin.mockview.model.UserSchoolEducation;
-import com.hashedin.mockview.model.UserUniversityEducation;
-import com.hashedin.mockview.model.UserWorkExperience;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -15,8 +9,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserEducationRequest {
-    List<UserSchoolEducation> userSchoolEducationsList;
-    List<UserUniversityEducation> userUniversityEducationList;
+    List<UserEducation> userEducationList;
 
 }
