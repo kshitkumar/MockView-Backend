@@ -1,16 +1,19 @@
 package com.hashedin.mockview.service;
 
-import com.hashedin.mockview.dto.UserEducationRequest;
-import com.hashedin.mockview.dto.UserExperienceRequest;
-import com.hashedin.mockview.dto.UserInputRequest;
-import com.hashedin.mockview.dto.UserSkillRequest;
+import com.hashedin.mockview.dto.*;
 import com.hashedin.mockview.model.*;
 import com.hashedin.mockview.repository.*;
+import com.hashedin.mockview.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,9 +32,28 @@ public class UserService {
     UserWorkExperienceRepository userWorkExperienceRepository;
     @Autowired
     SkillRepository skillRepository;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @Autowired
+    CustomUserDetailsService userDetailsService;
+    @Autowired
+    JwtUtil jwtUtil;
 
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    public String getUserNameForCurrentUser() {
+        logger.debug("Using Security Context Holder for finding username from jwt token");
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        String userName = null;
+        if (principal instanceof UserDetails) {
+            userName = ((UserDetails) principal).getUsername();
+        } else {
+            userName = principal.toString();
+        }
+        return userName;
+    }
 
     public ResponseEntity userSignUp(User inputUser) {
 
@@ -39,19 +61,20 @@ public class UserService {
         try {
             User user = userRepository.save(inputUser);
             logger.debug("Saved user {} ", user);
-            return new ResponseEntity(user.getId(), HttpStatus.CREATED);
+            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
+            return new ResponseEntity(HttpStatus.CREATED);
         } catch (Exception ex) {
             logger.debug("Exception occurred while saving");
-            return new ResponseEntity(ex.toString(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
 
 
     }
 
-    public ResponseEntity addUserDetails(Integer id, UserProfile inputUserProfile) {
-        logger.debug("Entered updateUserDetails Method");
+    public ResponseEntity addUserDetails(String userName, UserProfile inputUserProfile) {
+        logger.debug("Entering updateUserDetails Method");
         try {
-            User savedUser = userRepository.findById(id).get();
+            User savedUser = userRepository.findByEmailId(userName);
             if (savedUser != null) {
                 UserProfile userProfile = UserProfile.builder()
                         .user(savedUser)
@@ -60,8 +83,9 @@ public class UserService {
                         .state(inputUserProfile.getState())
                         .pinCode(inputUserProfile.getPinCode())
                         .build();
+                String jwt = generateJwtTokenForCurrentUser(userName);
                 UserProfile savedUserProfile = userProfileRepository.save(userProfile);
-                return new ResponseEntity(savedUser.getId(), HttpStatus.ACCEPTED);
+                return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
             }
             logger.error("User details not Found");
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
@@ -97,14 +121,10 @@ public class UserService {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity addEducationDetails(Integer id, UserEducationRequest userEducationRequest) {
+    public ResponseEntity addEducationDetails(String userName, UserEducationRequest userEducationRequest) {
 
         logger.debug("Entering addEducationDetails method");
-        if (id == null) {
-            logger.debug("UserId not found in Input request");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findByEmailId(userName);
         List<UserEducation> inputUserEducationList = userEducationRequest.getUserEducationList();
 
         List<UserEducation> userEducationList = inputUserEducationList.stream().map(x -> x.builder()
@@ -121,18 +141,15 @@ public class UserService {
 
         userEducationRepository.saveAll(userEducationList);
 
-        return new ResponseEntity(user.getId(), HttpStatus.OK);
+        String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
+        return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
 
 
     }
 
-    public ResponseEntity addUserExperienceDetails(Integer id, UserExperienceRequest userExperienceRequest) {
+    public ResponseEntity addUserExperienceDetails(String userName, UserExperienceRequest userExperienceRequest) {
         logger.debug("Entering addUserExperienceDetails");
-        User user = userRepository.findById(id).get();
-        if (user == null) {
-            logger.debug("User details corresponding to User Id {} not found", id);
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        User user = userRepository.findByEmailId(userName);
         try {
             UserWorkExperience userWorkExperience = new UserWorkExperience();
             List<UserWorkExperience> inputUserWorkExperienceList = userExperienceRequest.getUserWorkExperienceList();
@@ -150,8 +167,9 @@ public class UserService {
                             .build())
                     .collect(Collectors.toList());
             userWorkExperienceRepository.saveAll(userWorkExperienceList);
-            logger.debug("User id {} experience details successfully inserted in database ", id);
-            return new ResponseEntity(user.getId(), HttpStatus.OK);
+            logger.debug("User experience details successfully inserted in database ");
+            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
+            return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
 
         } catch (Exception exception) {
             logger.error("Exception occurred" + exception.toString());
@@ -161,10 +179,10 @@ public class UserService {
 
     }
 
-    public ResponseEntity addUserSkills(Integer id, UserSkillRequest userSkillRequest) {
+    public ResponseEntity addUserSkills(String userName, UserSkillRequest userSkillRequest) {
         logger.debug("Entering method addUserSkills");
 
-        User user = userRepository.findById(id).get();
+        User user = userRepository.findByEmailId(userName);
         if (user == null) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
@@ -179,7 +197,8 @@ public class UserService {
                     .collect(Collectors.toList());
             skillRepository.saveAll(skillList);
             logger.debug("Saved user skill details in database");
-            return new ResponseEntity(user.getId(), HttpStatus.OK);
+            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
+            return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
 
         } catch (Exception exception) {
             logger.debug("Exception occurred in method addUserSkills");
@@ -188,4 +207,22 @@ public class UserService {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
+    public ResponseEntity createAuthenticationToken(UserInputRequest userInputRequest) throws Exception {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userInputRequest.getEmailId(),
+                            userInputRequest.getPassword()));
+        } catch (BadCredentialsException exception) {
+            throw new Exception("Incorrect Username or Password", exception);
+        }
+        String jwt = generateJwtTokenForCurrentUser(userInputRequest.getEmailId());
+        return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+    }
+
+    private String generateJwtTokenForCurrentUser(String emailId) {
+        final UserDetails userDetails = userDetailsService
+                .loadUserByUsername(emailId);
+        final String jwt = jwtUtil.generateToken(userDetails);
+        return jwt;
+    }
 }

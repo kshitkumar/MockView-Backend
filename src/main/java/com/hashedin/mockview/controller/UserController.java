@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,35 +23,45 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("/user")
+
+    @PostMapping("/authenticate")
+    public ResponseEntity createAuthenticationToken(@RequestBody UserInputRequest userInputRequest) throws Exception {
+        return userService.createAuthenticationToken(userInputRequest);
+    }
+
+    @PostMapping("/signup")
     public ResponseEntity createUser(@RequestBody User user) {
         logger.debug("Input User object is {}", user);
         return userService.userSignUp(user);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity loginUser(@RequestBody UserInputRequest userInputRequest) {
-        return userService.loginUser(userInputRequest);
+//    @GetMapping("/user")
+//    public ResponseEntity loginUser(@RequestBody UserInputRequest userInputRequest) {
+//        return userService.loginUser(userInputRequest);
+//    }
+
+    @PostMapping("/user/details")
+    public ResponseEntity addDetails(@RequestBody UserProfile userProfile) {
+        String userName = userService.getUserNameForCurrentUser();
+        return userService.addUserDetails(userName, userProfile);
     }
 
-    @PostMapping("/user/details/{id}")
-    public ResponseEntity addDetails(@PathVariable int id, @RequestBody UserProfile userProfile) {
-        return userService.addUserDetails(id, userProfile);
+    @PostMapping("/user/details/education")
+    public ResponseEntity addEducationDetails(@RequestBody UserEducationRequest userEducationRequest) {
+        String userName = userService.getUserNameForCurrentUser();
+        return userService.addEducationDetails(userName, userEducationRequest);
     }
 
-    @PostMapping("/user/details/education/{id}")
-    public ResponseEntity addEducationDetails(@PathVariable Integer id, @RequestBody UserEducationRequest userEducationRequest) {
-        return userService.addEducationDetails(id, userEducationRequest);
+    @PostMapping("/user/details/experience")
+    public ResponseEntity addExperienceDetails(@RequestBody UserExperienceRequest userExperienceRequest) {
+        String userName = userService.getUserNameForCurrentUser();
+        return userService.addUserExperienceDetails(userName, userExperienceRequest);
     }
 
-    @PostMapping("/user/details/experience/{id}")
-    public ResponseEntity addExperienceDetails(@PathVariable Integer id, @RequestBody UserExperienceRequest userExperienceRequest) {
-        return userService.addUserExperienceDetails(id,userExperienceRequest);
-    }
-    @PostMapping("/user/details/skill/{id}")
-    public ResponseEntity addUserSkill(@PathVariable Integer id, @RequestBody UserSkillRequest userSkillRequest)
-    {
-        return userService.addUserSkills(id,userSkillRequest);
+    @PostMapping("/user/details/skill")
+    public ResponseEntity addUserSkill(@RequestBody UserSkillRequest userSkillRequest) {
+        String userName = userService.getUserNameForCurrentUser();
+        return userService.addUserSkills(userName, userSkillRequest);
     }
 
 
