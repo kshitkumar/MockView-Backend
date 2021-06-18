@@ -1,5 +1,6 @@
 package com.hashedin.mockview.model;
 
+import com.hashedin.mockview.dto.Proficiency;
 import com.hashedin.mockview.dto.Type;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,8 @@ public class Skill {
     private Type type;
 
     private String name;
+    @Enumerated(EnumType.STRING)
+    private Proficiency proficiency;
 
     @ManyToOne
     @JoinColumn

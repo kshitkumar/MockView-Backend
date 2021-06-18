@@ -32,6 +32,7 @@ public class UserService {
     UserWorkExperienceRepository userWorkExperienceRepository;
     @Autowired
     SkillRepository skillRepository;
+
     @Autowired
     AuthenticationManager authenticationManager;
     @Autowired
@@ -55,26 +56,28 @@ public class UserService {
         return userName;
     }
 
-    public ResponseEntity userSignUp(User inputUser) {
+    public User userSignUp(User inputUser) {
 
         logger.debug("Entering userSignUp method");
         try {
             User user = userRepository.save(inputUser);
             logger.debug("Saved user {} ", user);
-            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
-            return new ResponseEntity(HttpStatus.CREATED);
+            return user;
+
         } catch (Exception ex) {
             logger.debug("Exception occurred while saving");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+            return new User();
         }
 
 
     }
 
-    public ResponseEntity addUserDetails(String userName, UserProfile inputUserProfile) {
+    public String addUserDetails(String userName, UserProfile inputUserProfile) {
         logger.debug("Entering updateUserDetails Method");
+        String jwt =null;
         try {
             User savedUser = userRepository.findByEmailId(userName);
+
             if (savedUser != null) {
                 UserProfile userProfile = UserProfile.builder()
                         .user(savedUser)
@@ -83,17 +86,17 @@ public class UserService {
                         .state(inputUserProfile.getState())
                         .pinCode(inputUserProfile.getPinCode())
                         .build();
-                String jwt = generateJwtTokenForCurrentUser(userName);
-                UserProfile savedUserProfile = userProfileRepository.save(userProfile);
-                return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+                userProfileRepository.save(userProfile);
+                 jwt = generateJwtTokenForCurrentUser(userName);
+                return jwt;
             }
-            logger.error("User details not Found");
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+
 
         } catch (Exception ex) {
-            logger.error("Exception occured {}", ex.toString());
-            return new ResponseEntity(ex.toString(), HttpStatus.BAD_REQUEST);
+            logger.error("Exception occurred {}", ex.toString());
+            ex.printStackTrace();
         }
+        return jwt;
     }
 
     public ResponseEntity loginUser(UserInputRequest userInputRequest) {
@@ -121,7 +124,7 @@ public class UserService {
         return new ResponseEntity(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity addEducationDetails(String userName, UserEducationRequest userEducationRequest) {
+    public String addEducationDetails(String userName, UserEducationRequest userEducationRequest) {
 
         logger.debug("Entering addEducationDetails method");
         User user = userRepository.findByEmailId(userName);
@@ -141,13 +144,13 @@ public class UserService {
 
         userEducationRepository.saveAll(userEducationList);
 
-        String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
-        return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+        return generateJwtTokenForCurrentUser(user.getEmailId());
+
 
 
     }
 
-    public ResponseEntity addUserExperienceDetails(String userName, UserExperienceRequest userExperienceRequest) {
+    public String addUserExperienceDetails(String userName, UserExperienceRequest userExperienceRequest) {
         logger.debug("Entering addUserExperienceDetails");
         User user = userRepository.findByEmailId(userName);
         try {
@@ -168,24 +171,21 @@ public class UserService {
                     .collect(Collectors.toList());
             userWorkExperienceRepository.saveAll(userWorkExperienceList);
             logger.debug("User experience details successfully inserted in database ");
-            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
-            return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+            return generateJwtTokenForCurrentUser(user.getEmailId());
+
 
         } catch (Exception exception) {
             logger.error("Exception occurred" + exception.toString());
             exception.printStackTrace();
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return null;
 
     }
 
-    public ResponseEntity addUserSkills(String userName, UserSkillRequest userSkillRequest) {
+    public String addUserSkills(String userName, UserSkillRequest userSkillRequest) {
         logger.debug("Entering method addUserSkills");
 
         User user = userRepository.findByEmailId(userName);
-        if (user == null) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
         try {
             List<Skill> inputSkillList = userSkillRequest.getSkillList();
             List<Skill> skillList = inputSkillList.stream()
@@ -197,17 +197,17 @@ public class UserService {
                     .collect(Collectors.toList());
             skillRepository.saveAll(skillList);
             logger.debug("Saved user skill details in database");
-            String jwt = generateJwtTokenForCurrentUser(user.getEmailId());
-            return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+            return generateJwtTokenForCurrentUser(user.getEmailId());
+
 
         } catch (Exception exception) {
             logger.debug("Exception occurred in method addUserSkills");
             exception.printStackTrace();
         }
-        return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        return null;
     }
 
-    public ResponseEntity createAuthenticationToken(UserInputRequest userInputRequest) throws Exception {
+    public String createAuthenticationToken(UserInputRequest userInputRequest) throws Exception {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userInputRequest.getEmailId(),
@@ -215,8 +215,8 @@ public class UserService {
         } catch (BadCredentialsException exception) {
             throw new Exception("Incorrect Username or Password", exception);
         }
-        String jwt = generateJwtTokenForCurrentUser(userInputRequest.getEmailId());
-        return new ResponseEntity(new UserAuthenticationResponse(jwt), HttpStatus.OK);
+        return  generateJwtTokenForCurrentUser(userInputRequest.getEmailId());
+
     }
 
     private String generateJwtTokenForCurrentUser(String emailId) {
@@ -225,4 +225,31 @@ public class UserService {
         final String jwt = jwtUtil.generateToken(userDetails);
         return jwt;
     }
+
+//    public ResponseEntity getUserDetails(String userName) {
+//
+//        User user = userRepository.findByEmailId(userName);
+//        if (user == null) {
+//            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+//        }
+//        UserProfile userProfile =user.getUserProfile();
+//        List<UserEducation> userEducationList =user.getUserEducationList();
+//        List<UserWorkExperience> userWorkExperienceList =user.getUserWorkExperience();
+//        List<Skill> skill = user.getSkillList();
+//
+//        UserProfile outputUserProfile =UserProfile.builder()
+//                .city(userProfile.getCity())
+//                .country(userProfile.getCountry())
+//                .pinCode(userProfile.getPinCode())
+//                .state(userProfile.getState())
+//                .build();
+//        userEducationList.stream()
+//                .map(x->x.builder())
+//
+//        UserDetailResponse userDetailResponse =UserDetailResponse.builder()
+//                .userProfile(outputUserProfile)
+//
+//
+//
+//    }
 }
