@@ -1,7 +1,6 @@
 package com.hashedin.mockview.dto;
 
 import com.hashedin.mockview.model.Gender;
-import com.hashedin.mockview.model.User;
 import lombok.*;
 
 import java.sql.Date;

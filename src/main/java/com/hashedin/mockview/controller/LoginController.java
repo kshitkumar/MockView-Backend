@@ -1,10 +1,8 @@
 package com.hashedin.mockview.controller;
 
-import com.hashedin.mockview.dto.UserAuthenticationResponse;
 import com.hashedin.mockview.dto.UserDto;
 import com.hashedin.mockview.dto.UserInputRequest;
 import com.hashedin.mockview.exception.InvalidPasswordException;
-import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.service.AuthenticationService;
 import com.hashedin.mockview.service.UserService;
 import lombok.extern.slf4j.Slf4j;

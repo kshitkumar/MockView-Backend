@@ -31,7 +31,6 @@ public class UserDetailService {
 
         log.debug("Entering addUserDetail method");
 
-        UserProfile userProfile = userDetailRequest.getUserProfile();
         educationService.addEducationDetails(id,userDetailRequest.getUserEducationRequest());
         experienceService.addUserExperienceDetails(id,userDetailRequest.getUserExperienceRequest());
         skillService.addUserSkills(id,userDetailRequest.getUserSkillRequest());

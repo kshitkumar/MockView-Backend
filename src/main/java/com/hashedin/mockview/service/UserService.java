@@ -58,7 +58,7 @@ public class UserService {
     }
     public UserDto getUserDetails(String emailId) {
         User user=userRepository.findByEmailId(emailId);
-        UserDto userDtoOutput=UserDto.builder()
+        return UserDto.builder()
                 .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -67,7 +67,6 @@ public class UserService {
                 .gender(user.getGender())
                 .phoneNumber(user.getPhoneNumber())
                 .build();
-        return userDtoOutput;
     }
 
 

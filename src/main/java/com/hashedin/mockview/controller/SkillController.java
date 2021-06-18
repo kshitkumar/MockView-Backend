@@ -20,8 +20,8 @@ public class SkillController {
     UserService userService;
 
     @PostMapping
-    public ResponseEntity addUserSkill(@PathVariable("userId") Integer userId, @RequestBody UserSkillRequest userSkillRequest) throws ResourceNotFoundException {
+    public ResponseEntity <Void>addUserSkill(@PathVariable("userId") Integer userId, @RequestBody UserSkillRequest userSkillRequest) throws ResourceNotFoundException {
         skillService.addUserSkills(userId, userSkillRequest);
-        return new ResponseEntity( HttpStatus.CREATED);
+        return new ResponseEntity<>( HttpStatus.CREATED);
     }
 }

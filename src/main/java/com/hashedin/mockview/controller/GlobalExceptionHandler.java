@@ -14,19 +14,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity handleResourceNotFound(ResourceNotFoundException exception) {
+	public ResponseEntity<Void> handleResourceNotFound(ResourceNotFoundException exception) {
 		log.error(exception.getMessage());
 		return ResponseEntity.notFound().build();
 	}
 	
 	@ExceptionHandler(DuplicateResourceException.class)
-	public ResponseEntity handleDuplicateResource(DuplicateResourceException exception) {
+	public ResponseEntity<Void> handleDuplicateResource(DuplicateResourceException exception) {
 		log.error(exception.getMessage());
 		return ResponseEntity.status(HttpStatus.CONFLICT).build();
 	}
 	
 	@ExceptionHandler(BadRequestException.class)
-	public ResponseEntity handleBadRequest(BadRequestException exception) {
+	public ResponseEntity<Void> handleBadRequest(BadRequestException exception) {
 		log.error(exception.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 	}

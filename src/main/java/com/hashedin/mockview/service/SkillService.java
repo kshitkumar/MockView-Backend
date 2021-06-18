@@ -28,7 +28,6 @@ public class SkillService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));;
-        try {
             List<Skill> inputSkillList = userSkillRequest.getSkillList();
             List<Skill> skillList = inputSkillList.stream()
                     .map(x -> x.builder()
@@ -40,13 +39,8 @@ public class SkillService {
                     .collect(Collectors.toList());
             skillRepository.saveAll(skillList);
             log.debug("Saved user skill details in database");
-//            return userService.generateJwtTokenForCurrentUser(user.getEmailId());
 
 
-        } catch (Exception exception) {
-            log.debug("Exception occurred in method addUserSkills");
-            exception.printStackTrace();
-        }
-//        return null;
+
     }
 }
