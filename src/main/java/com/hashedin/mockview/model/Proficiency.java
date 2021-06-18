@@ -1,4 +1,4 @@
-package com.hashedin.mockview.dto;
+package com.hashedin.mockview.model;
 
 public enum Proficiency {
     BEGINNER,INTERMEDIATE,EXPERT

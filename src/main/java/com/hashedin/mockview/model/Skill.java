@@ -1,12 +1,6 @@
 package com.hashedin.mockview.model;
 
-import com.hashedin.mockview.dto.Proficiency;
-import com.hashedin.mockview.dto.Type;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 import javax.persistence.*;
 

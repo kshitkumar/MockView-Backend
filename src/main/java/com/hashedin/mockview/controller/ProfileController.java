@@ -1,8 +1,8 @@
 package com.hashedin.mockview.controller;
 
-import com.hashedin.mockview.dto.UserDetailRequest;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
-import com.hashedin.mockview.service.UserDetailService;
+import com.hashedin.mockview.model.UserProfile;
+import com.hashedin.mockview.service.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,19 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users/{userId}/detail")
 @Slf4j
-public class UserDetailController {
+@RequestMapping("/users/{userId}/profile")
+public class ProfileController {
 
     @Autowired
-    UserDetailService userDetailService;
+    UserProfileService userProfileService;
 
     @PostMapping
-    public ResponseEntity<Void> addUserDetails(@PathVariable("userId")Integer userId ,@RequestBody UserDetailRequest userDetailRequest) throws ResourceNotFoundException {
-        userDetailService.addUserDetail(userId,userDetailRequest);
+    public ResponseEntity<Void> addDetails(@PathVariable("userId") Integer id, @RequestBody UserProfile userProfile) throws ResourceNotFoundException {
+        userProfileService.addUserDetails(id,userProfile);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-
-
 }
