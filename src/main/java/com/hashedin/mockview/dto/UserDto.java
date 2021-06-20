@@ -1,6 +1,7 @@
 package com.hashedin.mockview.dto;
 
 import com.hashedin.mockview.model.Gender;
+import com.hashedin.mockview.model.User;
 import lombok.*;
 
 import java.sql.Date;
@@ -19,5 +20,17 @@ public class UserDto {
     private String emailId;
     private String phoneNumber;
     private String jwt;
+
+   public static UserDto convertToDto(User user)
+    {
+        return UserDto.builder().id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .dateOfBirth(user.getDateOfBirth())
+                .gender(user.getGender())
+                .emailId(user.getEmailId())
+                .phoneNumber(user.getPhoneNumber())
+                .build();
+    }
 
 }

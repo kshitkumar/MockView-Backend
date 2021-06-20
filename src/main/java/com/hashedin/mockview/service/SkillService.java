@@ -23,11 +23,9 @@ public class SkillService {
     @Autowired
     UserService userService;
 
-    public void addUserSkills(Integer id, UserSkillRequest userSkillRequest) throws ResourceNotFoundException {
+    public void addUserSkills(User user, UserSkillRequest userSkillRequest) throws ResourceNotFoundException {
         log.debug("Entering method addUserSkills");
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));;
             List<Skill> inputSkillList = userSkillRequest.getSkillList();
             List<Skill> skillList = inputSkillList.stream()
                     .map(x -> x.builder()

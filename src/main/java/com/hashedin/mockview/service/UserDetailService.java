@@ -24,6 +24,8 @@ public class UserDetailService {
     SkillService skillService;
     @Autowired
     UserProfileService userProfileService;
+    @Autowired
+    AwardService awardService;
 
     public User addUserDetail(Integer id, UserDetailRequest userDetailRequest) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
@@ -31,10 +33,16 @@ public class UserDetailService {
 
         log.debug("Entering addUserDetail method");
 
-        educationService.addEducationDetails(id,userDetailRequest.getUserEducationRequest());
-        experienceService.addUserExperienceDetails(id,userDetailRequest.getUserExperienceRequest());
-        skillService.addUserSkills(id,userDetailRequest.getUserSkillRequest());
-        userProfileService.addUserDetails(id,userDetailRequest.getUserProfile());
+        if (userDetailRequest.getUserEducationRequest() != null)
+            educationService.addEducationDetails(user, userDetailRequest.getUserEducationRequest());
+        if (userDetailRequest.getUserExperienceRequest() != null)
+            experienceService.addUserExperienceDetails(user, userDetailRequest.getUserExperienceRequest());
+        if (userDetailRequest.getUserSkillRequest() != null)
+            skillService.addUserSkills(user, userDetailRequest.getUserSkillRequest());
+        if (userDetailRequest.getUserProfile() != null)
+            userProfileService.addUserDetails(user, userDetailRequest.getUserProfile());
+        if (userDetailRequest.getUserAwardRequest() != null)
+            awardService.addAwardDetails(user, userDetailRequest.getUserAwardRequest());
 
         return user;
 

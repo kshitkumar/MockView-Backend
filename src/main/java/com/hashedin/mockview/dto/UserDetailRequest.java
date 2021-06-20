@@ -13,5 +13,6 @@ public class UserDetailRequest {
     private UserExperienceRequest userExperienceRequest;
     private UserSkillRequest userSkillRequest;
     private UserProfile userProfile;
+    private UserAwardRequest userAwardRequest;
 
 }

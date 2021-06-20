@@ -21,10 +21,8 @@ public class ExperienceService {
     @Autowired
     UserWorkExperienceRepository userWorkExperienceRepository;
 
-    public void addUserExperienceDetails(Integer id, UserExperienceRequest userExperienceRequest) throws ResourceNotFoundException {
+    public void addUserExperienceDetails(User user, UserExperienceRequest userExperienceRequest) throws ResourceNotFoundException {
         log.debug("Entering addUserExperienceDetails");
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
         List<UserWorkExperience> inputUserWorkExperienceList = userExperienceRequest.getUserWorkExperienceList();
         List<UserWorkExperience> userWorkExperienceList = inputUserWorkExperienceList.stream()
                 .map(x -> x.builder()

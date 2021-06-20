@@ -22,12 +22,10 @@ public class EducationService {
     @Autowired
     UserEducationRepository userEducationRepository;
 
-    public List<UserEducation> addEducationDetails(Integer id, UserEducationRequest userEducationRequest) throws ResourceNotFoundException {
+    public List<UserEducation> addEducationDetails(User user, UserEducationRequest userEducationRequest) throws ResourceNotFoundException {
 
         log.debug("Entering addEducationDetails method");
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
         List<UserEducation> inputUserEducationList = userEducationRequest.getUserEducationList();
-
         List<UserEducation> userEducationList = inputUserEducationList.stream().map(x -> x.builder()
                 .degreeName(x.getDegreeName())
                 .stream(x.getStream())

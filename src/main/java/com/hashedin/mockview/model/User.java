@@ -1,12 +1,12 @@
 package com.hashedin.mockview.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sun.istack.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -55,6 +55,9 @@ public class User implements UserDetails {
     private List<UserEducation> userEducationList;
     @OneToMany(mappedBy ="user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<Skill> skillList;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<Award> awardList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

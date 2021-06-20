@@ -17,14 +17,12 @@ public class UserProfileService {
     @Autowired
     UserProfileRepository userProfileRepository;
 
-    public void addUserDetails(Integer id, UserProfile inputUserProfile) throws ResourceNotFoundException {
+    public void addUserDetails(User user, UserProfile inputUserProfile) throws ResourceNotFoundException {
         log.debug("Entering updateUserDetails Method");
-        User savedUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
 
-        if (savedUser != null) {
+        if (user != null) {
             UserProfile userProfile = UserProfile.builder()
-                    .user(savedUser)
+                    .user(user)
                     .city(inputUserProfile.getCity())
                     .country(inputUserProfile.getCountry())
                     .state(inputUserProfile.getState())

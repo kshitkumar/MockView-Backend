@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/users/{userId}/detail")
 @Slf4j
+@CrossOrigin
 public class UserDetailController {
 
     @Autowired
