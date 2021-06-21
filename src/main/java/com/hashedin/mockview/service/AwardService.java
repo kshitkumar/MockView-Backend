@@ -42,4 +42,10 @@ public class AwardService {
 
 
     }
+
+    public List<Award> findAwardDetails(User user) {
+        log.debug("Entering findAwardDetails method");
+        List<Award> awardList = awardRepository.findByUser(user);
+        return  awardList;
+    }
 }

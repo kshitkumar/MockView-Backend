@@ -42,4 +42,9 @@ public class ExperienceService {
 
 
     }
+
+    public List<UserWorkExperience> getExperienceDetails(User user) {
+        log.debug("Entering getExperienceDetails method");
+        return userWorkExperienceRepository.findByUser(user);
+    }
 }

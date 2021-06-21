@@ -1,6 +1,7 @@
 package com.hashedin.mockview.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.sql.Date;
 public class Award {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int id;
 
     private String name;
@@ -29,6 +31,7 @@ public class Award {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private User user;
 
 }

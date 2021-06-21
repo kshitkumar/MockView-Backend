@@ -1,6 +1,7 @@
 package com.hashedin.mockview.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -16,10 +17,12 @@ public class UserEducation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int id;
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private User user;
 
     private String degreeName;

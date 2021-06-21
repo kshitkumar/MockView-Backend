@@ -1,5 +1,6 @@
 package com.hashedin.mockview.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,10 +14,12 @@ import javax.persistence.*;
 public class UserProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int id;
 
     @OneToOne
     @JoinColumn
+    @JsonIgnore
     private User user;
 
     private String city;

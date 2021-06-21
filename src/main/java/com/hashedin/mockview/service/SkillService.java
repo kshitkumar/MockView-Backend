@@ -26,19 +26,25 @@ public class SkillService {
     public void addUserSkills(User user, UserSkillRequest userSkillRequest) throws ResourceNotFoundException {
         log.debug("Entering method addUserSkills");
 
-            List<Skill> inputSkillList = userSkillRequest.getSkillList();
-            List<Skill> skillList = inputSkillList.stream()
-                    .map(x -> x.builder()
-                            .name(x.getName())
-                            .user(user)
-                            .proficiency(x.getProficiency())
-                            .type(x.getType())
-                            .build())
-                    .collect(Collectors.toList());
-            skillRepository.saveAll(skillList);
-            log.debug("Saved user skill details in database");
+        List<Skill> inputSkillList = userSkillRequest.getSkillList();
+        List<Skill> skillList = inputSkillList.stream()
+                .map(x -> x.builder()
+                        .name(x.getName())
+                        .user(user)
+                        .proficiency(x.getProficiency())
+                        .type(x.getType())
+                        .build())
+                .collect(Collectors.toList());
+        skillRepository.saveAll(skillList);
+        log.debug("Saved user skill details in database");
 
 
+    }
+
+
+    public List<Skill> findSkillDetails(User user) {
+        log.debug("Entering findSkillDetails method");
+        return skillRepository.findByUser(user);
 
     }
 }

@@ -2,6 +2,7 @@ package com.hashedin.mockview.controller;
 
 import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.DuplicateResourceException;
+import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,5 +27,12 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.CREATED);
         else
             return new ResponseEntity<>( HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/{userId}/password")
+    public ResponseEntity<Void> changePassword(@PathVariable Integer userId,@RequestBody String password) throws ResourceNotFoundException, DuplicateResourceException {
+        log.debug("Entering controller method changePassword");
+        userService.updatePassword(userId,password);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

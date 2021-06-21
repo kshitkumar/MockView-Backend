@@ -55,7 +55,7 @@ class UserServiceTest {
 
 
         User returnedUser = userService.userSignUp(user);
-        assertEquals(user.toString(),returnedUser.toString());
+        assertEquals(user.getId(),returnedUser.getId());
 
     }
 

@@ -37,10 +37,16 @@ public class EducationService {
                 .user(user)
                 .build()).collect(Collectors.toList());
 
-       return userEducationRepository.saveAll(userEducationList);
+        return userEducationRepository.saveAll(userEducationList);
 
+    }
 
+    public List<UserEducation> getEducationDetails(User user) throws ResourceNotFoundException {
+
+        log.debug("Entering getEducationDetails method");
+        return userEducationRepository.findByUser(user);
 
 
     }
+
 }

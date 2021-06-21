@@ -33,4 +33,9 @@ public class UserProfileService {
 
     }
 
+    public UserProfile findProfileDetails(User user) {
+        log.debug("Entering findUserProfileDetails method");
+        return userProfileRepository.findByUser(user);
+
+    }
 }

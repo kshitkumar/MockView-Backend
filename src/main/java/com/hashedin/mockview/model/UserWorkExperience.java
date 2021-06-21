@@ -1,6 +1,7 @@
 package com.hashedin.mockview.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,10 +16,12 @@ import java.sql.Date;
 public class UserWorkExperience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private int id;
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private User user;
     private String companyName;
     private String industry;

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 
 @Repository
+@Transactional
 public interface UserRepository extends JpaRepository<User,Integer> {
 
     User findByEmailIdAndPassword(String emailId, String password);
@@ -18,7 +19,10 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     User findByEmailId(String emailId);
 
     @Modifying
-    @Transactional
     @Query("update User set profileComplete =:status where id =:id")
     void updateProfileStatus(Boolean status,Integer id);
+
+    @Modifying
+    @Query("update User set password=:newBcryptPassword where id=:id")
+    void updatePassword(String newBcryptPassword, Integer id);
 }
