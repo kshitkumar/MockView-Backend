@@ -51,6 +51,7 @@ public class UserService {
                 .gender(inputUser.getGender())
                 .phoneNumber(inputUser.getPhoneNumber())
                 .password(passwordEncoder.encode(inputUser.getPassword()))
+                .profileComplete(Boolean.FALSE)
                 .build();
          return userRepository.save(user);
 
@@ -66,6 +67,7 @@ public class UserService {
                 .emailId(user.getEmailId())
                 .gender(user.getGender())
                 .phoneNumber(user.getPhoneNumber())
+                .profileComplete(user.getProfileComplete())
                 .build();
     }
 

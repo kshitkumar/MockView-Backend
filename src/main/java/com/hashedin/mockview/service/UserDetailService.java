@@ -44,8 +44,10 @@ public class UserDetailService {
         if (userDetailRequest.getUserAwardRequest() != null)
             awardService.addAwardDetails(user, userDetailRequest.getUserAwardRequest());
 
+        userRepository.updateProfileStatus(Boolean.TRUE,user.getId());
         return user;
 
 
     }
+
 }

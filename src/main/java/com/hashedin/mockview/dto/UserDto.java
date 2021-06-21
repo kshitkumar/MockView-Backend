@@ -20,6 +20,7 @@ public class UserDto {
     private String emailId;
     private String phoneNumber;
     private String jwt;
+    private Boolean profileComplete;
 
    public static UserDto convertToDto(User user)
     {
@@ -30,6 +31,7 @@ public class UserDto {
                 .gender(user.getGender())
                 .emailId(user.getEmailId())
                 .phoneNumber(user.getPhoneNumber())
+                .profileComplete(user.getProfileComplete())
                 .build();
     }
 

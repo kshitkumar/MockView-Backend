@@ -4,6 +4,7 @@ import com.hashedin.mockview.dto.UserDto;
 import com.hashedin.mockview.dto.UserInputRequest;
 import com.hashedin.mockview.exception.InvalidPasswordException;
 import com.hashedin.mockview.service.AuthenticationService;
+import com.hashedin.mockview.service.UserDetailService;
 import com.hashedin.mockview.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class LoginController {
     AuthenticationService authenticationService;
     @Autowired
     UserService userService;
+    @Autowired
+    UserDetailService userDetailService;
 
     @PostMapping("/login")
     public ResponseEntity<UserDto> createAuthenticationToken(@RequestBody UserInputRequest userInputRequest) throws InvalidPasswordException {

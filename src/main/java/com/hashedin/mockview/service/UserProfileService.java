@@ -30,5 +30,7 @@ public class UserProfileService {
                     .build();
             userProfileRepository.save(userProfile);
         }
+
     }
+
 }

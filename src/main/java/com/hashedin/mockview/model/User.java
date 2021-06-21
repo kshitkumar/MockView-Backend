@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @Column(length = 10,unique = true)
     private String phoneNumber;
 
+    @Column(columnDefinition = "TINYINT", length = 1)
+    private Boolean profileComplete;
+
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
