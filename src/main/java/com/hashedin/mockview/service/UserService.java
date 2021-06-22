@@ -2,14 +2,12 @@ package com.hashedin.mockview.service;
 
 import com.hashedin.mockview.dto.UserDto;
 import com.hashedin.mockview.exception.DuplicateResourceException;
-import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,15 +55,6 @@ public class UserService {
         return userRepository.save(user);
 
 
-    }
-    public void updatePassword(Integer id,String newPassword) throws ResourceNotFoundException, DuplicateResourceException {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
-        String newBcryptPassword = passwordEncoder.encode(newPassword);
-        boolean value=passwordEncoder.matches(newPassword,user.getPassword());
-        if(passwordEncoder.matches(newPassword,user.getPassword()))
-            throw new DuplicateResourceException("New Password should not be same as last password");
-        userRepository.updatePassword(newBcryptPassword,id);
     }
 
     public UserDto getUserDetails(String emailId) {

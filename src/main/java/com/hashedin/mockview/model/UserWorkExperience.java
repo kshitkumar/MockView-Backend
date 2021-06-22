@@ -23,10 +23,14 @@ public class UserWorkExperience {
     @JoinColumn
     @JsonIgnore
     private User user;
+
     private String companyName;
-    private String industry;
+
+    private Industry industry;
     private String role;
-    private String position;
+
+    private Position position;
+
     private String responsibility;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
