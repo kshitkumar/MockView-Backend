@@ -84,7 +84,7 @@ public class SlotService {
         }
         return interviewerDto;
     }
-    private List<InterviewerDto> findInterviewersWithIndustryAndDate(Industry industry, Date date, User user) {
+    private List<InterviewerDto> findInterviewersWithIndustryAndDate(Industry industry, Date date) {
 
         List<InterviewerDto> interviewerDtoList = new ArrayList<>();
         List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
@@ -137,15 +137,14 @@ public class SlotService {
         return interviewerDtoList;
     }
 
-    public List<InterviewerDto> findInterviewers(Integer id, Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
+    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+
 
         List<InterviewerDto> interviewerDtoList = new ArrayList<>();
         // all null
         if (company == null && position == null && (startTime == null && endTime == null)) {
-            return findInterviewersWithIndustryAndDate(industry,date,user);
+            return findInterviewersWithIndustryAndDate(industry,date);
 
         }
         // position not null

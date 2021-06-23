@@ -17,14 +17,14 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/interviews/{userId}")
+@RequestMapping("/interviews")
 public class InterviewController {
 
 
     @Autowired
     SlotService slotService;
 
-    @PostMapping("/availability")
+    @PostMapping("{userId}/availability")
     public ResponseEntity<Void> bookSlotForInterview(@PathVariable Integer userId,
                                                      @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
         slotService.bookSlots(userId, slotDto);
@@ -33,15 +33,14 @@ public class InterviewController {
 
     //TODO :Add timing wise filtering also
 
-    @GetMapping
-    public ResponseEntity<List<InterviewerDto>> getInterviewers(@PathVariable Integer userId
-            , @RequestParam("industry") Industry industry
+    @GetMapping("/interviewers")
+    public ResponseEntity<List<InterviewerDto>> getInterviewers(@RequestParam("industry") Industry industry
             , @RequestParam(value = "date") @JsonFormat(pattern = "yyyy-MM-dd") Date date
             , @RequestParam(value = "startTime",required = false)@JsonFormat(pattern = "HH:mm") LocalTime startTime
             , @RequestParam(value = "endTime",required = false)@JsonFormat(pattern = "HH:mm") LocalTime endTime
             , @RequestParam(value = "company",required = false) String company
             , @RequestParam(value = "position",required = false) Position position) throws ResourceNotFoundException {
-        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(userId,industry,date,company,position,startTime,endTime);
+        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(industry,date,company,position,startTime,endTime);
 
     return new ResponseEntity<List<InterviewerDto>>(interviewerDtoList,HttpStatus.OK);
     }
