@@ -27,17 +27,8 @@ public class AwardService {
         log.debug("Entering addAwardDetails");
 
         List<Award> inputAwardList = userAwardRequest.getUserAwardList();
-        List<Award> userAwardList = inputAwardList.stream()
-                .map(x -> x.builder()
-                        .awardCategory(x.getAwardCategory())
-                        .user(user)
-                        .name(x.getName())
-                        .organisation(x.getOrganisation())
-                        .receivingDate(x.getReceivingDate())
-                        .category(x.getCategory())
-                        .build())
-                .collect(Collectors.toList());
-        awardRepository.saveAll(userAwardList);
+        inputAwardList.stream().forEach(item -> item.setUser(user));
+        awardRepository.saveAll(inputAwardList);
         log.debug("Award details successfully inserted in database ");
 
 

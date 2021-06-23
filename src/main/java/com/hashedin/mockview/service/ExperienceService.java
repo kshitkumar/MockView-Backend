@@ -24,20 +24,8 @@ public class ExperienceService {
     public void addUserExperienceDetails(User user, UserExperienceRequest userExperienceRequest) throws ResourceNotFoundException {
         log.debug("Entering addUserExperienceDetails");
         List<UserWorkExperience> inputUserWorkExperienceList = userExperienceRequest.getUserWorkExperienceList();
-        List<UserWorkExperience> userWorkExperienceList = inputUserWorkExperienceList.stream()
-                .map(x -> x.builder()
-                        .companyName(x.getCompanyName())
-                        .currentEmployment(x.getCurrentEmployment())
-                        .endingDate(x.getEndingDate())
-                        .industry(x.getIndustry())
-                        .user(user)
-                        .joiningDate(x.getJoiningDate())
-                        .responsibility(x.getResponsibility())
-                        .role(x.getRole())
-                        .position(x.getPosition())
-                        .build())
-                .collect(Collectors.toList());
-        userWorkExperienceRepository.saveAll(userWorkExperienceList);
+        inputUserWorkExperienceList.stream().forEach(item -> item.setUser(user));
+        userWorkExperienceRepository.saveAll(inputUserWorkExperienceList);
         log.debug("User experience details successfully inserted in database ");
 
 

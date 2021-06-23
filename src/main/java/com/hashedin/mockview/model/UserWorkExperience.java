@@ -13,6 +13,7 @@ import java.sql.Date;
 @Getter
 @Setter
 @Builder
+@ToString
 public class UserWorkExperience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,9 +27,11 @@ public class UserWorkExperience {
 
     private String companyName;
 
+    @Enumerated(EnumType.STRING)
     private Industry industry;
     private String role;
 
+    @Enumerated(EnumType.STRING)
     private Position position;
 
     private String responsibility;

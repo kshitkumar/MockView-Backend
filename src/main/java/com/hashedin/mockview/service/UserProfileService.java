@@ -21,14 +21,8 @@ public class UserProfileService {
         log.debug("Entering updateUserDetails Method");
 
         if (user != null) {
-            UserProfile userProfile = UserProfile.builder()
-                    .user(user)
-                    .city(inputUserProfile.getCity())
-                    .country(inputUserProfile.getCountry())
-                    .state(inputUserProfile.getState())
-                    .pinCode(inputUserProfile.getPinCode())
-                    .build();
-            userProfileRepository.save(userProfile);
+            inputUserProfile.setUser(user);
+            userProfileRepository.save(inputUserProfile);
         }
 
     }

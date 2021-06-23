@@ -27,15 +27,8 @@ public class SkillService {
         log.debug("Entering method addUserSkills");
 
         List<Skill> inputSkillList = userSkillRequest.getSkillList();
-        List<Skill> skillList = inputSkillList.stream()
-                .map(x -> x.builder()
-                        .name(x.getName())
-                        .user(user)
-                        .proficiency(x.getProficiency())
-                        .type(x.getType())
-                        .build())
-                .collect(Collectors.toList());
-        skillRepository.saveAll(skillList);
+        inputSkillList.stream().forEach(item -> item.setUser(user));
+        skillRepository.saveAll(inputSkillList);
         log.debug("Saved user skill details in database");
 
 

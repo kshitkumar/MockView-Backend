@@ -26,18 +26,8 @@ public class EducationService {
 
         log.debug("Entering addEducationDetails method");
         List<UserEducation> inputUserEducationList = userEducationRequest.getUserEducationList();
-        List<UserEducation> userEducationList = inputUserEducationList.stream().map(x -> x.builder()
-                .degreeName(x.getDegreeName())
-                .stream(x.getStream())
-                .marks(x.getMarks())
-                .year(x.getYear())
-                .schoolName(x.getSchoolName())
-                .country(x.getCountry())
-                .educationCategory(x.getEducationCategory())
-                .user(user)
-                .build()).collect(Collectors.toList());
-
-        return userEducationRepository.saveAll(userEducationList);
+        inputUserEducationList.stream().forEach(item -> item.setUser(user));
+        return userEducationRepository.saveAll(inputUserEducationList);
 
     }
 
