@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/interviews")
 public class InterviewController {
 
