@@ -50,6 +50,93 @@ public class SlotService {
         slotRepository.saveAll(slotList);
     }
 
+    private InterviewerDto calculateExperience(UserWorkExperience experience)
+    {
+        InterviewerDto interviewerDto =new InterviewerDto();
+        Double monthExperience =0.0;
+
+        //not current employment
+        if(experience.getEndingDate() != null) {
+            int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
+
+            int m2 = experience.getEndingDate().getYear() * 12 + experience.getEndingDate().getMonth();
+            monthExperience += m2-m1 +1;
+            interviewerDto.setExperience(monthExperience);
+            interviewerDto.setEndingDate(experience.getEndingDate());
+        }
+        //is current employment
+        else {
+            interviewerDto.setCompany(experience.getCompanyName());
+            interviewerDto.setPosition(experience.getPosition());
+            interviewerDto.setEndingDate(experience.getEndingDate());
+            interviewerDto.setJoiningDate(experience.getJoiningDate());
+
+            //Experience calculation Logic
+
+            java.util.Date currentDate = new java.util.Date();
+
+
+            int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
+            int m2 = currentDate.getYear() * 12 + currentDate.getMonth();
+            monthExperience += m2-m1 +1;
+            interviewerDto.setExperience(monthExperience);
+
+        }
+        return interviewerDto;
+    }
+    private List<InterviewerDto> findInterviewersWithIndustryAndDate(Industry industry, Date date, User user) {
+
+        List<InterviewerDto> interviewerDtoList = new ArrayList<>();
+        List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
+
+        List<Integer> idList = slotsAvailable.stream()
+                .map(x -> x.getId())
+                .collect(Collectors.toList());
+        List<User> userList = userRepository.findByIdIn(idList);
+        List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByIndustryAndUserIn(industry, userList);
+
+        log.debug("User details when all optional fields are null are {}", userWorkExperienceList);
+
+
+        for (User u : userList) {
+            InterviewerDto interviewerDto = new InterviewerDto();
+            List<UserWorkExperience> workExperienceListForParticularId = userWorkExperienceList.parallelStream().filter(x -> x.getUser().equals(u)).collect(Collectors.toList());
+
+            Double totalExperience = 0.0;
+            for (UserWorkExperience experience : workExperienceListForParticularId) {
+
+                InterviewerDto interviewerDto1 =calculateExperience(experience);
+
+                if(interviewerDto1.getEndingDate() == null) {
+                    interviewerDto.setCompany(interviewerDto1.getCompany());
+                    interviewerDto.setPosition(interviewerDto1.getPosition());
+                    interviewerDto.setEndingDate(interviewerDto1.getEndingDate());
+                    interviewerDto.setJoiningDate(interviewerDto1.getJoiningDate());
+                }
+                totalExperience += interviewerDto1.getExperience();
+
+            }
+            totalExperience /= 12;
+            interviewerDto.setExperience(totalExperience);
+            List<Slot> slotsForCurrentInterviewer = slotsAvailable.parallelStream().filter(x -> x.getInterviewer().equals(u)).collect(Collectors.toList());
+            Integer slotCharges;
+            List<TimeSlot> slotList = new ArrayList<>();
+            for (Slot slots : slotsForCurrentInterviewer) {
+                TimeSlot timeSlot = new TimeSlot();
+                timeSlot.setStartTime(slots.getInterviewStartTime());
+                timeSlot.setEndTime(slots.getInterviewStartTime().plusHours(1));
+
+                slotList.add(timeSlot);
+
+            }
+            interviewerDto.setTimeSlots(slotList);
+
+            interviewerDtoList.add(interviewerDto);
+
+        }
+        return interviewerDtoList;
+    }
+
     public List<InterviewerDto> findInterviewers(Integer id, Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
 
         User user = userRepository.findById(id)
@@ -58,70 +145,7 @@ public class SlotService {
         List<InterviewerDto> interviewerDtoList = new ArrayList<>();
         // all null
         if (company == null && position == null && (startTime == null && endTime == null)) {
-            List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
-
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByIndustryAndUserIn(industry, userList);
-
-            log.debug("User details when all optional fields are null are {}", userWorkExperienceList);
-
-
-
-
-            for (User u : userList) {
-                InterviewerDto interviewerDto = new InterviewerDto();
-                List<UserWorkExperience> workExperienceListForParticularId = userWorkExperienceList.parallelStream().filter(x -> x.getUser().equals(u)).collect(Collectors.toList());
-
-                Double totalExperience = 0.0;
-                for (UserWorkExperience experience : workExperienceListForParticularId) {
-                    //not current employment
-                    if (experience.getEndingDate() != null) {
-                        int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
-
-                        int m2 = experience.getEndingDate().getYear() * 12 + experience.getEndingDate().getMonth();
-                        totalExperience += m2 - m1 + 1;
-                    }
-                    //is current employment
-                    else {
-                        interviewerDto.setCompany(experience.getCompanyName());
-                        interviewerDto.setPosition(experience.getPosition());
-                        interviewerDto.setEndingDate(null);
-                        interviewerDto.setJoiningDate(experience.getJoiningDate());
-
-                        //Experience calculation Logic
-
-                        java.util.Date currentDate = new java.util.Date();
-
-                        int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
-                        int m2 = currentDate.getYear() * 12 + currentDate.getMonth();
-                        totalExperience += m2 - m1 + 1;
-
-                    }
-                }
-                totalExperience /= 12;
-                interviewerDto.setExperience(totalExperience);
-               List<Slot> slotsForCurrentInterviewer=  slotsAvailable.parallelStream().filter(x ->x.getInterviewer().equals(u)).collect(Collectors.toList());
-               Integer slotCharges;
-               List<TimeSlot> slotList =new ArrayList<>();
-               for(Slot slots :slotsForCurrentInterviewer)
-                {
-                    TimeSlot timeSlot =new TimeSlot();
-                    timeSlot.setStartTime(slots.getInterviewStartTime());
-                    timeSlot.setEndTime(slots.getInterviewStartTime().plusHours(1));
-
-                    slotList.add(timeSlot);
-
-                }
-               interviewerDto.setTimeSlots(slotList);
-
-               interviewerDtoList.add(interviewerDto);
-
-            }
-            return interviewerDtoList;
-
+            return findInterviewersWithIndustryAndDate(industry,date,user);
 
         }
         // position not null
@@ -213,7 +237,7 @@ public class SlotService {
                     .findByIndustryAndCompanyNameAndPositionAndUserIn(industry, company, position, userList);
             log.debug("User details when nothing is null are {}", userWorkExperienceList);
         }
-        return  new ArrayList<>();
+        return new ArrayList<>();
 
 
     }
