@@ -1,0 +1,59 @@
+stages:
+  - build
+  - deploy
+  
+build:
+  image: maven:3.6.3-openjdk-11
+  stage: build
+  only:
+  - master
+  tags:
+  - runner-4
+  script:
+    - export DATABASE_NAME=mockview
+    - export DATABASE_USER=mockview
+    - export DATABASE_PASSWORD="Root@123"
+    - export DATABASE_HOST=34.93.80.134
+    - export DATABASE_PORT=3306
+    - mvn clean package -B
+  artifacts:
+    paths:
+      - target/
+deploy_job:
+  image: google/cloud-sdk:alpine
+  stage: deploy
+  only:
+  - master
+  tags:
+  - runner-4
+  dependencies: 
+    - build
+  before_script:
+  - "ServiceName=${CI_PROJECT_NAME/./-}"
+  - "echo $ServiceName"
+  - |
+    cat <<EOF >> app.yaml
+    runtime: java11
+    env_variables:
+      DATABASE_NAME: "$DATABASE_NAME"
+      DATABASE_USER: "$DATABASE_USER"
+      DATABASE_PASSWORD: "$DATABASE_PASSWORD"
+      DATABASE_HOST: "$DATABASE_HOST"
+      DATABASE_PORT: "$DATABASE_PORT"
+    manual_scaling:
+      instances: 1
+    liveness_check:
+      path: "/test"
+    readiness_check:
+      path: "/test"
+    service: $ServiceName
+    EOF
+  - "cat app.yaml"
+  -  echo $SERVICEKEY >  $CI_PIPELINE_ID.json
+  script:
+  - gcloud auth activate-service-account --key-file $CI_PIPELINE_ID.json
+  - gcloud --project hu18-groupa-java  app deploy target/*.jar --appyaml app.yaml --version v1
+  - url=$(gcloud app services browse $ServiceName --no-launch-browser --project hu18-groupa-java )
+  - echo $url
+  after_script:
+  - rm $CI_PIPELINE_ID.json
