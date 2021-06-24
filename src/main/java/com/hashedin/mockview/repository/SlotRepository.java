@@ -1,9 +1,7 @@
 package com.hashedin.mockview.repository;
 
-import com.hashedin.mockview.model.Industry;
 import com.hashedin.mockview.model.Slot;
 import com.hashedin.mockview.model.SlotStatus;
-import com.hashedin.mockview.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.sql.Date;

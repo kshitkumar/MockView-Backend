@@ -3,6 +3,7 @@ package com.hashedin.mockview.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.SlotDto;
+import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.Industry;
 import com.hashedin.mockview.model.Position;
@@ -29,7 +30,7 @@ public class InterviewController {
     public ResponseEntity<Void> bookSlotForInterview(@PathVariable Integer userId,
                                                      @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
         slotService.bookSlots(userId, slotDto);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
@@ -39,7 +40,9 @@ public class InterviewController {
             , @RequestParam(value = "startTime", required = false) String startTime
             , @RequestParam(value = "endTime", required = false) String endTime
             , @RequestParam(value = "company", required = false) String company
-            , @RequestParam(value = "position", required = false) Position position) throws ResourceNotFoundException {
+            , @RequestParam(value = "position", required = false) Position position) throws BadRequestException {
+
+
         LocalTime convertedStartTime = null;
         LocalTime convertedEndTime = null;
         if (startTime != null && endTime != null) {
@@ -50,7 +53,8 @@ public class InterviewController {
         List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(industry, date, company, position, convertedStartTime, convertedEndTime);
 
 
-        return new ResponseEntity<List<InterviewerDto>>(interviewerDtoList, HttpStatus.OK);
+        return new ResponseEntity<>(interviewerDtoList, HttpStatus.OK);
+
     }
 
 }

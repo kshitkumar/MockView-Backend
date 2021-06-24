@@ -2,7 +2,6 @@ package com.hashedin.mockview.dto;
 
 import lombok.*;
 
-import java.sql.Date;
 import java.time.LocalTime;
 
 @Builder
@@ -11,6 +10,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimeSlot {
+    private int id;
     private LocalTime startTime;
     private LocalTime endTime;
 

@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor

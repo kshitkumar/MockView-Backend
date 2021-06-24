@@ -1,6 +1,5 @@
 package com.hashedin.mockview.service;
 
-import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.UserExperienceRequest;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.User;
@@ -12,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,11 +30,11 @@ public class ExperienceService {
 
 
     }
-    public Double calculateUserExperience(List<UserWorkExperience> workExperience)
-    {
+
+    public Double calculateUserExperience(List<UserWorkExperience> workExperience) {
         Double monthExperience = 0.0;
 
-        for(UserWorkExperience experience:workExperience) {
+        for (UserWorkExperience experience : workExperience) {
             //not current employment
             if (experience.getEndingDate() != null) {
                 int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
@@ -57,12 +56,15 @@ public class ExperienceService {
 
             }
         }
-        return monthExperience/12;
+        return monthExperience / 12;
     }
 
-    public UserWorkExperience getCurrentCompany(List<UserWorkExperience> userWorkExperienceList)
-    {
-        return (UserWorkExperience) userWorkExperienceList.stream().filter(x ->x.getEndingDate() ==null).findFirst().get();
+    public UserWorkExperience getCurrentCompany(List<UserWorkExperience> userWorkExperienceList) {
+        Optional<UserWorkExperience> optionalUserWorkExperience = userWorkExperienceList.stream().filter(x -> x.getCurrentEmployment().equals(Boolean.TRUE)).findFirst();
+        if (optionalUserWorkExperience.isPresent())
+            return optionalUserWorkExperience.get();
+        else
+            return null;
     }
 
     public List<UserWorkExperience> getExperienceDetails(User user) {

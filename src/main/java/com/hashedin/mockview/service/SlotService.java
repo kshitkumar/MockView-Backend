@@ -3,6 +3,7 @@ package com.hashedin.mockview.service;
 import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.SlotDto;
 import com.hashedin.mockview.dto.TimeSlot;
+import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.*;
 import com.hashedin.mockview.repository.SlotRepository;
@@ -13,12 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,7 +90,7 @@ public class SlotService {
     }
 
 
-    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
+    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException {
 
         // getting data from database
 
@@ -109,12 +106,6 @@ public class SlotService {
 
 
         // creating Map for certain fields
-
-//        Map<User, List<Slot>> slotMap = slotsAvailable.stream()
-//                .collect(Collectors.groupingBy(Slot::getInterviewer));
-//
-//        Map<Integer, User> userMap = userList.stream()
-//                .collect(Collectors.toMap(User::getId, User -> User));
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
@@ -148,7 +139,7 @@ public class SlotService {
                 .filter(x -> SlotService.filterForTime(startTime, endTime, x))
                 .collect(Collectors.toList());
 
-        // creating Set and Map fro filtered Data
+        // creating Set and Map for filtered Data
 
         Set<Integer> filteredExperienceSet = filteredExperienceList.stream()
                 .map(x -> x.getUser().getId())
@@ -177,12 +168,13 @@ public class SlotService {
             interviewerDto.setEndingDate(currentCompanyMap.get(u).getEndingDate());
             interviewerDto.setJoiningDate(currentCompanyMap.get(u).getJoiningDate());
             interviewerDto.setCompany(currentCompanyMap.get(u).getCompanyName());
-            interviewerDto.setInterviewerName(u.getFirstName() + " "+ u.getLastName());
-
+            interviewerDto.setInterviewerName(u.getFirstName() + " " + u.getLastName());
+            interviewerDto.setId(u.getId());
             List<Slot> slotsForCurrentInterviewer = filterSlotMap.get(u);
             List<TimeSlot> slotList = new ArrayList<>();
             for (Slot slots : slotsForCurrentInterviewer) {
                 TimeSlot timeSlot = new TimeSlot();
+                timeSlot.setId(slots.getId());
                 timeSlot.setStartTime(slots.getInterviewStartTime());
                 timeSlot.setEndTime(slots.getInterviewStartTime().plusHours(1));
 
@@ -194,7 +186,10 @@ public class SlotService {
             interviewerDtoList.add(interviewerDto);
 
         }
-        return interviewerDtoList;
+        if (interviewerDtoList.isEmpty())
+            throw new BadRequestException("No Interviewer Found for given criteria");
+        else
+            return interviewerDtoList;
 
 
     }
