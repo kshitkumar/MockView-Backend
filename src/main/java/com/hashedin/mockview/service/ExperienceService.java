@@ -2,6 +2,8 @@ package com.hashedin.mockview.service;
 
 import com.hashedin.mockview.dto.UserExperienceRequest;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
+import com.hashedin.mockview.model.Industry;
+import com.hashedin.mockview.model.Position;
 import com.hashedin.mockview.model.User;
 import com.hashedin.mockview.model.UserWorkExperience;
 import com.hashedin.mockview.repository.UserRepository;
@@ -30,6 +32,36 @@ public class ExperienceService {
 
 
     }
+    public static boolean filterForIndustry(Industry industry, UserWorkExperience userWorkExperience) {
+        if (industry != null) {
+            if (userWorkExperience.getIndustry().equals(industry))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean filterForCompany(String company, UserWorkExperience userWorkExperience) {
+        if (company != null) {
+            if (userWorkExperience.getCompanyName().equals(company))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean filterForPosition(Position position, UserWorkExperience userWorkExperience) {
+        if (position != null) {
+            if (userWorkExperience.getPosition().equals(position))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
 
     public Double calculateUserExperience(List<UserWorkExperience> workExperience) {
         Double monthExperience = 0.0;

@@ -59,35 +59,6 @@ public class SlotService {
         return true;
     }
 
-    public static boolean filterForIndustry(Industry industry, UserWorkExperience userWorkExperience) {
-        if (industry != null) {
-            if (userWorkExperience.getIndustry().equals(industry))
-                return true;
-            else
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean filterForCompany(String company, UserWorkExperience userWorkExperience) {
-        if (company != null) {
-            if (userWorkExperience.getCompanyName().equals(company))
-                return true;
-            else
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean filterForPosition(Position position, UserWorkExperience userWorkExperience) {
-        if (position != null) {
-            if (userWorkExperience.getPosition().equals(position))
-                return true;
-            else
-                return false;
-        }
-        return true;
-    }
 
 
     public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException {
@@ -130,9 +101,9 @@ public class SlotService {
         // filtering criteria
 
         List<UserWorkExperience> filteredExperienceList = userWorkExperienceList.stream()
-                .filter(x -> SlotService.filterForIndustry(industry, x))
-                .filter(x -> SlotService.filterForCompany(company, x))
-                .filter(x -> SlotService.filterForPosition(position, x))
+                .filter(x -> ExperienceService.filterForIndustry(industry, x))
+                .filter(x -> ExperienceService.filterForCompany(company, x))
+                .filter(x -> ExperienceService.filterForPosition(position, x))
                 .collect(Collectors.toList());
 
         List<Slot> filteredSlotList = slotsAvailable.stream()
