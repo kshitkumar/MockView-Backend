@@ -17,9 +17,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +33,8 @@ public class SlotService {
 
     @Autowired
     UserWorkExperienceRepository userWorkExperienceRepository;
+    @Autowired
+    ExperienceService experienceService;
 
     public void bookSlots(Integer id, SlotDto slotDto) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
@@ -50,76 +51,135 @@ public class SlotService {
         slotRepository.saveAll(slotList);
     }
 
-    private InterviewerDto calculateExperience(UserWorkExperience experience)
-    {
-        InterviewerDto interviewerDto =new InterviewerDto();
-        Double monthExperience =0.0;
-
-        //not current employment
-        if(experience.getEndingDate() != null) {
-            int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
-
-            int m2 = experience.getEndingDate().getYear() * 12 + experience.getEndingDate().getMonth();
-            monthExperience += m2-m1 +1;
-            interviewerDto.setExperience(monthExperience);
-            interviewerDto.setEndingDate(experience.getEndingDate());
+    public static boolean filterForTime(LocalTime startTime, LocalTime endTime, Slot slot) {
+        if (startTime != null && endTime != null) {
+            if (slot.getInterviewStartTime().compareTo(startTime) >= 0 &&
+                    slot.getInterviewStartTime().compareTo(endTime) < 0)
+                return true;
+            else
+                return false;
         }
-        //is current employment
-        else {
-            interviewerDto.setCompany(experience.getCompanyName());
-            interviewerDto.setPosition(experience.getPosition());
-            interviewerDto.setEndingDate(experience.getEndingDate());
-            interviewerDto.setJoiningDate(experience.getJoiningDate());
-
-            //Experience calculation Logic
-
-            java.util.Date currentDate = new java.util.Date();
-
-
-            int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
-            int m2 = currentDate.getYear() * 12 + currentDate.getMonth();
-            monthExperience += m2-m1 +1;
-            interviewerDto.setExperience(monthExperience);
-
-        }
-        return interviewerDto;
+        return true;
     }
-    private List<InterviewerDto> findInterviewersWithIndustryAndDate(Industry industry, Date date) {
 
-        List<InterviewerDto> interviewerDtoList = new ArrayList<>();
+    public static boolean filterForIndustry(Industry industry, UserWorkExperience userWorkExperience) {
+        if (industry != null) {
+            if (userWorkExperience.getIndustry().equals(industry))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean filterForCompany(String company, UserWorkExperience userWorkExperience) {
+        if (company != null) {
+            if (userWorkExperience.getCompanyName().equals(company))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean filterForPosition(Position position, UserWorkExperience userWorkExperience) {
+        if (position != null) {
+            if (userWorkExperience.getPosition().equals(position))
+                return true;
+            else
+                return false;
+        }
+        return true;
+    }
+
+
+    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
+
+        // getting data from database
+
         List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
 
-        List<Integer> idList = slotsAvailable.stream()
-                .map(x -> x.getId())
-                .collect(Collectors.toList());
+        Set idList = slotsAvailable.stream()
+                .map(x -> x.getInterviewer().getId())
+                .collect(Collectors.toSet());
+
         List<User> userList = userRepository.findByIdIn(idList);
-        List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByIndustryAndUserIn(industry, userList);
 
-        log.debug("User details when all optional fields are null are {}", userWorkExperienceList);
+        List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByUserIn(userList);
 
 
-        for (User u : userList) {
+        // creating Map for certain fields
+
+//        Map<User, List<Slot>> slotMap = slotsAvailable.stream()
+//                .collect(Collectors.groupingBy(Slot::getInterviewer));
+//
+//        Map<Integer, User> userMap = userList.stream()
+//                .collect(Collectors.toMap(User::getId, User -> User));
+
+        Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .collect(Collectors.groupingBy(UserWorkExperience::getUser));
+
+        Map<User, Double> experienceMap = new HashMap<>();
+
+        HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
+
+        // handling logic of Current Company and Experience
+
+        for (Map.Entry<User, List<UserWorkExperience>> entry : userWorkExperienceMap.entrySet()) {
+            User user = entry.getKey();
+            List<UserWorkExperience> workExperienceList = entry.getValue();
+            Double experienceInYears = experienceService.calculateUserExperience(workExperienceList);
+
+            currentCompanyMap.put(user, experienceService.getCurrentCompany(workExperienceList));
+
+            experienceMap.put(user, experienceInYears);
+        }
+
+
+        // filtering criteria
+
+        List<UserWorkExperience> filteredExperienceList = userWorkExperienceList.stream()
+                .filter(x -> SlotService.filterForIndustry(industry, x))
+                .filter(x -> SlotService.filterForCompany(company, x))
+                .filter(x -> SlotService.filterForPosition(position, x))
+                .collect(Collectors.toList());
+
+        List<Slot> filteredSlotList = slotsAvailable.stream()
+                .filter(x -> SlotService.filterForTime(startTime, endTime, x))
+                .collect(Collectors.toList());
+
+        // creating Set and Map fro filtered Data
+
+        Set<Integer> filteredExperienceSet = filteredExperienceList.stream()
+                .map(x -> x.getUser().getId())
+                .collect(Collectors.toSet());
+
+
+        Map<User, List<Slot>> filterSlotMap = filteredSlotList.stream()
+                .collect(Collectors.groupingBy(Slot::getInterviewer));
+
+        // based on both criteria updating user in list
+
+        List<User> filteredUserList = userList.stream()
+                .filter(x -> filterSlotMap.containsKey(x) && filteredExperienceSet.contains(x.getId()))
+                .collect(Collectors.toList());
+
+
+        // populating response Data
+        List<InterviewerDto> interviewerDtoList = new ArrayList<>();
+
+
+        for (User u : filteredUserList) {
             InterviewerDto interviewerDto = new InterviewerDto();
-            List<UserWorkExperience> workExperienceListForParticularId = userWorkExperienceList.parallelStream().filter(x -> x.getUser().equals(u)).collect(Collectors.toList());
 
-            Double totalExperience = 0.0;
-            for (UserWorkExperience experience : workExperienceListForParticularId) {
+            interviewerDto.setExperience(experienceMap.get(u));
+            interviewerDto.setPosition(currentCompanyMap.get(u).getPosition());
+            interviewerDto.setEndingDate(currentCompanyMap.get(u).getEndingDate());
+            interviewerDto.setJoiningDate(currentCompanyMap.get(u).getJoiningDate());
+            interviewerDto.setCompany(currentCompanyMap.get(u).getCompanyName());
+            interviewerDto.setInterviewerName(u.getFirstName() + " "+ u.getLastName());
 
-                InterviewerDto interviewerDto1 =calculateExperience(experience);
-
-                if(interviewerDto1.getEndingDate() == null) {
-                    interviewerDto.setCompany(interviewerDto1.getCompany());
-                    interviewerDto.setPosition(interviewerDto1.getPosition());
-                    interviewerDto.setEndingDate(interviewerDto1.getEndingDate());
-                    interviewerDto.setJoiningDate(interviewerDto1.getJoiningDate());
-                }
-                totalExperience += interviewerDto1.getExperience();
-
-            }
-            totalExperience /= 12;
-            interviewerDto.setExperience(totalExperience);
-            List<Slot> slotsForCurrentInterviewer = slotsAvailable.parallelStream().filter(x -> x.getInterviewer().equals(u)).collect(Collectors.toList());
-            Integer slotCharges;
+            List<Slot> slotsForCurrentInterviewer = filterSlotMap.get(u);
             List<TimeSlot> slotList = new ArrayList<>();
             for (Slot slots : slotsForCurrentInterviewer) {
                 TimeSlot timeSlot = new TimeSlot();
@@ -135,109 +195,9 @@ public class SlotService {
 
         }
         return interviewerDtoList;
-    }
-
-    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws ResourceNotFoundException {
-
-
-
-        List<InterviewerDto> interviewerDtoList = new ArrayList<>();
-        // all null
-        if (company == null && position == null && (startTime == null && endTime == null)) {
-            return findInterviewersWithIndustryAndDate(industry,date);
-
-        }
-        // position not null
-        else if (company == null && (startTime == null && endTime == null)) {
-            List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndPositionAndUserIn(industry, position, userList);
-            log.debug("User details when Position is not null are {}", userWorkExperienceList);
-
-
-        }
-        // company not null
-        else if (position == null && (startTime == null && endTime == null)) {
-            List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndCompanyNameAndUserIn(industry, company, userList);
-            log.debug("User details when Position is not null are {}", userWorkExperienceList);
-        }
-        // time not null
-        else if (position == null && company == null) {
-            List<Slot> slotsAvailable = slotRepository
-                    .findByInterviewDateAndSlotStatusAndInterviewStartTimeGreaterThanEqualAndInterviewStartTimeLessThan(date, SlotStatus.VACANT, startTime, endTime);
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndUserIn(industry, userList);
-
-            log.debug("User details when Position is not null are {}", userWorkExperienceList);
-
-        }
-        //company is null
-        else if (company == null) {
-            List<Slot> slotsAvailable = slotRepository
-                    .findByInterviewDateAndSlotStatusAndInterviewStartTimeGreaterThanEqualAndInterviewStartTimeLessThan(date, SlotStatus.VACANT, startTime, endTime);
-
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndPositionAndUserIn(industry, position, userList);
-            log.debug("User details when company is null are {}", userWorkExperienceList);
-        }
-        //position is null
-        else if (position == null) {
-            List<Slot> slotsAvailable = slotRepository
-                    .findByInterviewDateAndSlotStatusAndInterviewStartTimeGreaterThanEqualAndInterviewStartTimeLessThan(date, SlotStatus.VACANT, startTime, endTime);
-
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndCompanyNameAndUserIn(industry, company, userList);
-            log.debug("User details when position is null are {}", userWorkExperienceList);
-        }
-        //time is null
-        else if ((startTime == null && endTime == null)) {
-            List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
-
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndCompanyNameAndPositionAndUserIn(industry, company, position, userList);
-            log.debug("User details when time is null are {}", userWorkExperienceList);
-
-        }
-        //nothing is null
-        else {
-            List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
-
-            List<Integer> idList = slotsAvailable.stream()
-                    .map(x -> x.getId())
-                    .collect(Collectors.toList());
-            List<User> userList = userRepository.findByIdIn(idList);
-            List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository
-                    .findByIndustryAndCompanyNameAndPositionAndUserIn(industry, company, position, userList);
-            log.debug("User details when nothing is null are {}", userWorkExperienceList);
-        }
-        return new ArrayList<>();
 
 
     }
+
+
 }

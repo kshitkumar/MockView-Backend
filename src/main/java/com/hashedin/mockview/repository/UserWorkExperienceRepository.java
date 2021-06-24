@@ -18,4 +18,6 @@ public interface UserWorkExperienceRepository extends JpaRepository<UserWorkExpe
     List<UserWorkExperience> findByIndustryAndCompanyNameAndUserIn(Industry industry, String company, List<User> userList);
 
     List<UserWorkExperience> findByIndustryAndCompanyNameAndPositionAndUserIn(Industry industry, String company, Position position, List<User> userList);
+
+    List<UserWorkExperience> findByUserIn(List<User> userList);
 }

@@ -1,5 +1,6 @@
 package com.hashedin.mockview.service;
 
+import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.UserExperienceRequest;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.User;
@@ -29,6 +30,39 @@ public class ExperienceService {
         log.debug("User experience details successfully inserted in database ");
 
 
+    }
+    public Double calculateUserExperience(List<UserWorkExperience> workExperience)
+    {
+        Double monthExperience = 0.0;
+
+        for(UserWorkExperience experience:workExperience) {
+            //not current employment
+            if (experience.getEndingDate() != null) {
+                int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
+
+                int m2 = experience.getEndingDate().getYear() * 12 + experience.getEndingDate().getMonth();
+                monthExperience += m2 - m1 + 1;
+            }
+            //is current employment
+            else {
+
+                //Experience calculation Logic
+
+                java.util.Date currentDate = new java.util.Date();
+
+
+                int m1 = experience.getJoiningDate().getYear() * 12 + experience.getJoiningDate().getMonth();
+                int m2 = currentDate.getYear() * 12 + currentDate.getMonth();
+                monthExperience += m2 - m1 + 1;
+
+            }
+        }
+        return monthExperience/12;
+    }
+
+    public UserWorkExperience getCurrentCompany(List<UserWorkExperience> userWorkExperienceList)
+    {
+        return (UserWorkExperience) userWorkExperienceList.stream().filter(x ->x.getEndingDate() ==null).findFirst().get();
     }
 
     public List<UserWorkExperience> getExperienceDetails(User user) {

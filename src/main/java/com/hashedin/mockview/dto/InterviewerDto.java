@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 public class InterviewerDto {
     private int id;
+    private String interviewerName;
     private String company;
     private Position position;
     private Date joiningDate;

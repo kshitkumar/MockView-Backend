@@ -32,18 +32,25 @@ public class InterviewController {
         return new ResponseEntity(HttpStatus.CREATED);
     }
 
-    //TODO :Add timing wise filtering also
 
     @GetMapping("/interviewers")
     public ResponseEntity<List<InterviewerDto>> getInterviewers(@RequestParam("industry") Industry industry
             , @RequestParam(value = "date") @JsonFormat(pattern = "yyyy-MM-dd") Date date
-            , @RequestParam(value = "startTime",required = false)@JsonFormat(pattern = "HH:mm") LocalTime startTime
-            , @RequestParam(value = "endTime",required = false)@JsonFormat(pattern = "HH:mm") LocalTime endTime
-            , @RequestParam(value = "company",required = false) String company
-            , @RequestParam(value = "position",required = false) Position position) throws ResourceNotFoundException {
-        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(industry,date,company,position,startTime,endTime);
+            , @RequestParam(value = "startTime", required = false) String startTime
+            , @RequestParam(value = "endTime", required = false) String endTime
+            , @RequestParam(value = "company", required = false) String company
+            , @RequestParam(value = "position", required = false) Position position) throws ResourceNotFoundException {
+        LocalTime convertedStartTime = null;
+        LocalTime convertedEndTime = null;
+        if (startTime != null && endTime != null) {
+            convertedStartTime = LocalTime.parse(startTime);
+            convertedEndTime = LocalTime.parse(endTime);
+        }
 
-    return new ResponseEntity<List<InterviewerDto>>(interviewerDtoList,HttpStatus.OK);
+        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(industry, date, company, position, convertedStartTime, convertedEndTime);
+
+
+        return new ResponseEntity<List<InterviewerDto>>(interviewerDtoList, HttpStatus.OK);
     }
 
 }

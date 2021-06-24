@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Repository
 @Transactional
@@ -27,5 +28,5 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     @Query("update User set password=:newBcryptPassword where id=:id")
     void updatePassword(String newBcryptPassword, Integer id);
 
-    List<User> findByIdIn(List<Integer> idList);
+    List<User> findByIdIn(Set idList);
 }
