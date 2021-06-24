@@ -61,9 +61,12 @@ public class SlotService {
 
 
 
-    public List<InterviewerDto> findInterviewers(Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException {
+    public List<InterviewerDto> findInterviewers(Integer id,Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException, ResourceNotFoundException {
 
         // getting data from database
+        User loggedInUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+
 
         List<Slot> slotsAvailable = slotRepository.findByInterviewDateAndSlotStatus(date, SlotStatus.VACANT);
 
@@ -123,7 +126,7 @@ public class SlotService {
         // based on both criteria updating user in list
 
         List<User> filteredUserList = userList.stream()
-                .filter(x -> filterSlotMap.containsKey(x) && filteredExperienceSet.contains(x.getId()))
+                .filter(x -> filterSlotMap.containsKey(x) && filteredExperienceSet.contains(x.getId()) && x.getId() != loggedInUser.getId())
                 .collect(Collectors.toList());
 
 
