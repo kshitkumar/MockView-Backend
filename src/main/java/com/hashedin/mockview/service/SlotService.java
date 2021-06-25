@@ -195,6 +195,7 @@ public class SlotService {
                     .id(slot.getId())
                     .startTime(slot.getInterviewStartTime())
                     .date(slot.getInterviewDate())
+                    .slotStatus(slot.getSlotStatus())
                     .build();
             timeSlotList.add(timeSlot);
         }
