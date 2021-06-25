@@ -33,11 +33,18 @@ public class SlotService {
     @Autowired
     ExperienceService experienceService;
 
-    public void bookSlots(Integer id, SlotDto slotDto) throws ResourceNotFoundException {
+    public void setSlotsForAvailability(Integer id, SlotDto slotDto) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
         List<Slot> slotList = slotDto.getSlotList();
         Integer interviewCharges = slotDto.getInterviewCharges();
+
+        List<Slot> slotsToBeDeleted = getSlotsForCurrentUserMoreThanCurrentDate(user);
+
+        List<Integer> slotsIdToBeDeleted = slotsToBeDeleted.stream().map(x ->x.getId()).collect(Collectors.toList());
+
+        slotRepository.deleteByIdIn(slotsIdToBeDeleted);
+
 
         slotList.stream().forEach(item ->
         {
@@ -58,10 +65,16 @@ public class SlotService {
         }
         return true;
     }
+    private List<Slot> getSlotsForCurrentUserMoreThanCurrentDate(User user)
+    {
+        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+
+        List<Slot> slotList = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(user, currentDate, SlotStatus.VACANT);
+        return slotList;
+    }
 
 
-
-    public List<InterviewerDto> findInterviewers(Integer id,Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException, ResourceNotFoundException {
+    public List<InterviewerDto> findInterviewers(Integer id, Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException, ResourceNotFoundException {
 
         // getting data from database
         User loggedInUser = userRepository.findById(id)
@@ -169,4 +182,37 @@ public class SlotService {
     }
 
 
+    public List<TimeSlot> getSlotsForAvailability(Integer id) throws ResourceNotFoundException {
+        User loggedInUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+
+        List<Slot> slotList = getSlotsForCurrentUserMoreThanCurrentDate(loggedInUser);
+
+        List<TimeSlot> timeSlotList = new ArrayList<>();
+
+        for (Slot slot : slotList) {
+            TimeSlot timeSlot = TimeSlot.builder()
+                    .id(slot.getId())
+                    .startTime(slot.getInterviewStartTime())
+                    .date(slot.getInterviewDate())
+                    .build();
+            timeSlotList.add(timeSlot);
+        }
+        return timeSlotList;
+
+
+    }
+
+    public void bookInterviewSlotForUser(Integer id, Integer slotId) throws ResourceNotFoundException {
+        User loggedInUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+        Slot slotToBeBooked =slotRepository.findById(slotId)
+                .orElseThrow(() ->new ResourceNotFoundException("No Slot Found associated with id: "+ slotId));
+
+//        slotToBeBooked.setSlotStatus(SlotStatus.BOOKED);
+//        slotToBeBooked.setInterviewee(loggedInUser);
+
+        slotRepository.updateIntervieweeAndStatus(slotToBeBooked.getId(),loggedInUser,SlotStatus.BOOKED);
+
+    }
 }
