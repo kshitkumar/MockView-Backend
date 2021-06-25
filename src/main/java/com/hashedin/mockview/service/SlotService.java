@@ -33,7 +33,7 @@ public class SlotService {
     @Autowired
     ExperienceService experienceService;
 
-    public void bookSlots(Integer id, SlotDto slotDto) throws ResourceNotFoundException {
+    public void setSlotsForAvailability(Integer id, SlotDto slotDto) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
         List<Slot> slotList = slotDto.getSlotList();
@@ -60,8 +60,7 @@ public class SlotService {
     }
 
 
-
-    public List<InterviewerDto> findInterviewers(Integer id,Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException, ResourceNotFoundException {
+    public List<InterviewerDto> findInterviewers(Integer id, Industry industry, Date date, String company, Position position, LocalTime startTime, LocalTime endTime) throws BadRequestException, ResourceNotFoundException {
 
         // getting data from database
         User loggedInUser = userRepository.findById(id)
@@ -169,4 +168,26 @@ public class SlotService {
     }
 
 
+    public List<TimeSlot> getSlotsForAvailability(Integer id) throws ResourceNotFoundException {
+        User loggedInUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+
+        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+
+        List<Slot> slotList = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(loggedInUser, currentDate, SlotStatus.VACANT);
+
+        List<TimeSlot> timeSlotList = new ArrayList<>();
+
+        for (Slot slot : slotList) {
+            TimeSlot timeSlot = TimeSlot.builder()
+                    .id(slot.getId())
+                    .startTime(slot.getInterviewStartTime())
+                    .date(slot.getInterviewDate())
+                    .build();
+            timeSlotList.add(timeSlot);
+        }
+        return timeSlotList;
+
+
+    }
 }

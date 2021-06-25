@@ -3,6 +3,7 @@ package com.hashedin.mockview.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.SlotDto;
+import com.hashedin.mockview.dto.TimeSlot;
 import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.Industry;
@@ -26,15 +27,23 @@ public class InterviewController {
     @Autowired
     SlotService slotService;
 
-    @PostMapping("{userId}/availability")
-    public ResponseEntity<Void> bookSlotForInterview(@PathVariable Integer userId,
+    @PostMapping("/{userId}/availability")
+    public ResponseEntity<Void> setSlotsForAvailability(@PathVariable Integer userId,
                                                      @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
-        slotService.bookSlots(userId, slotDto);
+        slotService.setSlotsForAvailability(userId, slotDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping("/{userId}/availability")
+    public ResponseEntity<List<TimeSlot>> getSlotsOfAvailability(@PathVariable Integer userId) throws ResourceNotFoundException {
+        List<TimeSlot> slotDtoList=  slotService.getSlotsForAvailability(userId);
+        return new ResponseEntity<>(slotDtoList,HttpStatus.OK);
+    }
 
-    @GetMapping("{userId}/interviewers")
+
+
+
+    @GetMapping("/{userId}/interviewers")
     public ResponseEntity<List<InterviewerDto>> getInterviewers(@PathVariable Integer userId,
             @RequestParam("industry") Industry industry
             , @RequestParam(value = "date") @JsonFormat(pattern = "yyyy-MM-dd") Date date
