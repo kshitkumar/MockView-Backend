@@ -19,14 +19,14 @@ import java.util.List;
 
 @RestController
 @CrossOrigin
-//@RequestMapping("/interviews")
+@RequestMapping("/interviews")
 public class InterviewController {
 
 
     @Autowired
     SlotService slotService;
 
-    @PostMapping("availability/{userId}")
+    @PostMapping("{userId}/availability")
     public ResponseEntity<Void> bookSlotForInterview(@PathVariable Integer userId,
                                                      @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
         slotService.bookSlots(userId, slotDto);
@@ -34,7 +34,7 @@ public class InterviewController {
     }
 
 
-    @GetMapping("/interviewers/{userId}")
+    @GetMapping("{userId}/interviewers")
     public ResponseEntity<List<InterviewerDto>> getInterviewers(@PathVariable Integer userId,
             @RequestParam("industry") Industry industry
             , @RequestParam(value = "date") @JsonFormat(pattern = "yyyy-MM-dd") Date date
