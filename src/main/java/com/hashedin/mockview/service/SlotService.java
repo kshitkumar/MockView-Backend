@@ -202,4 +202,17 @@ public class SlotService {
 
 
     }
+
+    public void bookInterviewSlotForUser(Integer id, Integer slotId) throws ResourceNotFoundException {
+        User loggedInUser = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+        Slot slotToBeBooked =slotRepository.findById(slotId)
+                .orElseThrow(() ->new ResourceNotFoundException("No Slot Found associated with id: "+ slotId));
+
+//        slotToBeBooked.setSlotStatus(SlotStatus.BOOKED);
+//        slotToBeBooked.setInterviewee(loggedInUser);
+
+        slotRepository.updateIntervieweeAndStatus(slotToBeBooked.getId(),loggedInUser,SlotStatus.BOOKED);
+
+    }
 }

@@ -29,23 +29,27 @@ public class InterviewController {
 
     @PostMapping("/{userId}/availability")
     public ResponseEntity<Void> setSlotsForAvailability(@PathVariable Integer userId,
-                                                     @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
+                                                        @RequestBody SlotDto slotDto) throws ResourceNotFoundException {
         slotService.setSlotsForAvailability(userId, slotDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}/availability")
     public ResponseEntity<List<TimeSlot>> getSlotsOfAvailability(@PathVariable Integer userId) throws ResourceNotFoundException {
-        List<TimeSlot> slotDtoList=  slotService.getSlotsForAvailability(userId);
-        return new ResponseEntity<>(slotDtoList,HttpStatus.OK);
+        List<TimeSlot> slotDtoList = slotService.getSlotsForAvailability(userId);
+        return new ResponseEntity<>(slotDtoList, HttpStatus.OK);
     }
 
-
-
+    @PostMapping("/{userId}/slots/{slotId}")
+    public ResponseEntity<Void> bookInterviewSlotForUser(@PathVariable("userId") Integer userId,
+                                                         @PathVariable("slotId") Integer slotId) throws ResourceNotFoundException {
+        slotService.bookInterviewSlotForUser(userId, slotId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @GetMapping("/{userId}/interviewers")
     public ResponseEntity<List<InterviewerDto>> getInterviewers(@PathVariable Integer userId,
-            @RequestParam("industry") Industry industry
+                                                                @RequestParam("industry") Industry industry
             , @RequestParam(value = "date") @JsonFormat(pattern = "yyyy-MM-dd") Date date
             , @RequestParam(value = "startTime", required = false) String startTime
             , @RequestParam(value = "endTime", required = false) String endTime
@@ -55,15 +59,15 @@ public class InterviewController {
 
         LocalTime convertedStartTime = null;
         LocalTime convertedEndTime = null;
-        if (startTime != null && endTime != null && !startTime.equals("")&& !endTime.equals("")) {
+        if (startTime != null && endTime != null && !startTime.equals("") && !endTime.equals("")) {
             convertedStartTime = LocalTime.parse(startTime);
             convertedEndTime = LocalTime.parse(endTime);
         }
 
-        if(company.equals(""))
-            company=null;
+        if (company.equals(""))
+            company = null;
 
-        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(userId,industry, date, company, position, convertedStartTime, convertedEndTime);
+        List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(userId, industry, date, company, position, convertedStartTime, convertedEndTime);
 
 
         return new ResponseEntity<>(interviewerDtoList, HttpStatus.OK);
