@@ -60,6 +60,9 @@ public class InterviewController {
             convertedEndTime = LocalTime.parse(endTime);
         }
 
+        if(company.equals(""))
+            company=null;
+
         List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(userId,industry, date, company, position, convertedStartTime, convertedEndTime);
 
 
