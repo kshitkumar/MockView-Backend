@@ -55,7 +55,7 @@ public class InterviewController {
 
         LocalTime convertedStartTime = null;
         LocalTime convertedEndTime = null;
-        if (startTime != null && endTime != null) {
+        if (startTime != null && endTime != null && !startTime.equals("")&& !endTime.equals("")) {
             convertedStartTime = LocalTime.parse(startTime);
             convertedEndTime = LocalTime.parse(endTime);
         }
