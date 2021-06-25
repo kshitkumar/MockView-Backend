@@ -39,6 +39,13 @@ public class SlotService {
         List<Slot> slotList = slotDto.getSlotList();
         Integer interviewCharges = slotDto.getInterviewCharges();
 
+        List<Slot> slotsToBeDeleted = getSlotsForCurrentUserMoreThanCurrentDate(user);
+
+        List<Integer> slotsIdToBeDeleted = slotsToBeDeleted.stream().map(x ->x.getId()).collect(Collectors.toList());
+
+        slotRepository.deleteByIdIn(slotsIdToBeDeleted);
+
+
         slotList.stream().forEach(item ->
         {
             item.setInterviewer(user);
@@ -57,6 +64,13 @@ public class SlotService {
                 return false;
         }
         return true;
+    }
+    private List<Slot> getSlotsForCurrentUserMoreThanCurrentDate(User user)
+    {
+        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+
+        List<Slot> slotList = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(user, currentDate, SlotStatus.VACANT);
+        return slotList;
     }
 
 
@@ -172,9 +186,7 @@ public class SlotService {
         User loggedInUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
 
-        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
-
-        List<Slot> slotList = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(loggedInUser, currentDate, SlotStatus.VACANT);
+        List<Slot> slotList = getSlotsForCurrentUserMoreThanCurrentDate(loggedInUser);
 
         List<TimeSlot> timeSlotList = new ArrayList<>();
 
