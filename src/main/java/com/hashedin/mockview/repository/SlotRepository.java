@@ -28,4 +28,6 @@ public interface SlotRepository extends JpaRepository<Slot, Integer> {
     @Modifying
     @Query("Update Slot set interviewee =:loggedInUser , slotStatus =:booked where id=:id")
     void updateIntervieweeAndStatus(int id, User loggedInUser, SlotStatus booked);
+
+//    List<Slot> findByInterviewerAndSlotStatusAndDateGreaterThanEqualAndInterviewStartTimeGreaterThanEqual(User loggedInUser, SlotStatus booked, LocalTime currentTime);
 }

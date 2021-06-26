@@ -41,7 +41,9 @@ public class SlotService {
 
         List<Slot> slotsToBeDeleted = getSlotsForCurrentUserMoreThanCurrentDate(user);
 
-        List<Integer> slotsIdToBeDeleted = slotsToBeDeleted.stream().map(x ->x.getId()).collect(Collectors.toList());
+        List<Integer> slotsIdToBeDeleted = slotsToBeDeleted.stream()
+                .filter(x ->x.getSlotStatus() == SlotStatus.VACANT)
+                .map(x ->x.getId()).collect(Collectors.toList());
 
         slotRepository.deleteByIdIn(slotsIdToBeDeleted);
 
@@ -69,7 +71,14 @@ public class SlotService {
     {
         java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
-        List<Slot> slotList = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(user, currentDate, SlotStatus.VACANT);
+        List<Slot> slotList =new ArrayList<>();
+
+        List<Slot> slotListVacant = slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(user, currentDate, SlotStatus.VACANT);
+        List<Slot> slotListBooked =slotRepository.findByInterviewerAndInterviewDateGreaterThanAndSlotStatus(user,currentDate,SlotStatus.BOOKED);
+
+        slotList.addAll(slotListBooked);
+        slotList.addAll(slotListVacant);
+
         return slotList;
     }
 
