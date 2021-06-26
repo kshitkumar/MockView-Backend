@@ -1,5 +1,6 @@
 package com.hashedin.mockview.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hashedin.mockview.model.Position;
 import lombok.*;
 
@@ -18,6 +19,8 @@ public class InterviewerDto {
     private Position position;
     private Date joiningDate;
     private Date endingDate;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Double experience;
     private List<TimeSlot> timeSlots;
 }
