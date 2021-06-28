@@ -78,8 +78,20 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewee().getFirstName() + " " + slot.getInterviewee().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
+
+
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -131,8 +143,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -198,8 +220,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewee().getFirstName() + " " + slot.getInterviewee().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -221,7 +253,7 @@ public class InterviewService {
         List<SlotStatus> slotStatusList = Arrays.asList(SlotStatus.COMPLETED,SlotStatus.BOOKED);
         List<Slot> slotListCompleted = slotRepository.findByIntervieweeAndSlotStatusInAndInterviewDateLessThan(loggedInUser, slotStatusList, currentDate);
 
-        // currently not handled time logic
+
 
         // making all previous slots less than current date as completed
         slotListCompleted.stream().forEach(x ->
@@ -266,8 +298,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
