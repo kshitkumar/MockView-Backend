@@ -104,6 +104,7 @@ public class SlotService {
         // creating Map for certain fields
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         Map<User, Double> experienceMap = new HashMap<>();
@@ -160,10 +161,27 @@ public class SlotService {
             InterviewerDto interviewerDto = new InterviewerDto();
 
             interviewerDto.setExperience(experienceMap.get(u));
-            interviewerDto.setPosition(currentCompanyMap.get(u).getPosition());
-            interviewerDto.setEndingDate(currentCompanyMap.get(u).getEndingDate());
-            interviewerDto.setJoiningDate(currentCompanyMap.get(u).getJoiningDate());
-            interviewerDto.setCompany(currentCompanyMap.get(u).getCompanyName());
+
+
+            Object currentUser = currentCompanyMap.get(u);
+            if(currentUser == null)
+            {
+                interviewerDto.setCompany(null);
+                interviewerDto.setPosition(null);
+                interviewerDto.setJoiningDate(null);
+                interviewerDto.setEndingDate(null);
+
+            }
+            else
+            {
+
+                interviewerDto.setPosition(currentCompanyMap.get(u).getPosition());
+                interviewerDto.setEndingDate(currentCompanyMap.get(u).getEndingDate());
+                interviewerDto.setJoiningDate(currentCompanyMap.get(u).getJoiningDate());
+                interviewerDto.setCompany(currentCompanyMap.get(u).getCompanyName());
+
+            }
+
             interviewerDto.setInterviewerName(u.getFirstName() + " " + u.getLastName());
             interviewerDto.setId(u.getId());
             List<Slot> slotsForCurrentInterviewer = filterSlotMap.get(u);

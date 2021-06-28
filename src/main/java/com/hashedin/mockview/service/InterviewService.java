@@ -78,7 +78,9 @@ public class InterviewService {
         List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByUserIn(userList);
 
 
+
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -100,8 +102,20 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewee().getFirstName() + " " + slot.getInterviewee().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
+
+
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -145,6 +159,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -166,8 +181,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -222,6 +247,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -244,8 +270,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewee().getFirstName() + " " + slot.getInterviewee().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
@@ -269,7 +305,7 @@ public class InterviewService {
         List<Slot> slotListFromRepo = slotRepository.findByIntervieweeAndSlotStatusInAndInterviewDateLessThanEqual(loggedInUser, slotStatusList, currentDate);
 
 
-        // currently not handled time logic
+
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -302,6 +338,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -324,8 +361,18 @@ public class InterviewService {
 
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
-            myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
-            myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+
+            Object company = currentCompanyMap.get(slot.getInterviewee());
+            if(company==null)
+            {
+                myInterviewDto.setCompany(null);
+                myInterviewDto.setPosition(null);
+            }
+            else
+            {
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+            }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
             myInterviewDto.setEndTime(slot.getInterviewStartTime().plusHours(1));
