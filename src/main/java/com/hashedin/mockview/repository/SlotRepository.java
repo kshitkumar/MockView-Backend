@@ -28,4 +28,19 @@ public interface SlotRepository extends JpaRepository<Slot, Integer> {
     @Modifying
     @Query("Update Slot set interviewee =:loggedInUser , slotStatus =:booked where id=:id")
     void updateIntervieweeAndStatus(int id, User loggedInUser, SlotStatus booked);
+
+
+    List<Slot> findByInterviewerAndSlotStatusAndInterviewDateGreaterThanEqual(User loggedInUser, SlotStatus booked, Date currentDate);
+
+    List<Slot> findByIntervieweeAndSlotStatusAndInterviewDateGreaterThanEqual(User loggedInUser, SlotStatus booked, Date currentDate);
+
+//    List<Slot> findByInterviewerAndSlotStatusAndInterviewDateLessThanEqual(User loggedInUser, SlotStatus booked, Date currentDate);
+
+    List<Slot> findByInterviewerAndSlotStatusAndInterviewDateLessThan(User loggedInUser, SlotStatus booked, Date currentDate);
+
+//    List<Slot> findByIntervieweeAndSlotStatusAndInterviewDateLessThan(User loggedInUser, SlotStatus booked, Date currentDate);
+
+    List<Slot> findByIntervieweeAndSlotStatusInAndInterviewDateLessThan(User loggedInUser, List<SlotStatus> slotStatusList, Date currentDate);
+
+    List<Slot> findByInterviewerAndSlotStatusInAndInterviewDateLessThan(User loggedInUser, List<SlotStatus> slotStatusList, Date currentDate);
 }
