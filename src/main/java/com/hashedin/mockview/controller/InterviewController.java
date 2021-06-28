@@ -2,12 +2,14 @@ package com.hashedin.mockview.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hashedin.mockview.dto.InterviewerDto;
+import com.hashedin.mockview.dto.MyInterviewDto;
 import com.hashedin.mockview.dto.SlotDto;
 import com.hashedin.mockview.dto.TimeSlot;
 import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.Industry;
 import com.hashedin.mockview.model.Position;
+import com.hashedin.mockview.service.InterviewService;
 import com.hashedin.mockview.service.SlotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ public class InterviewController {
 
     @Autowired
     SlotService slotService;
+    @Autowired
+    InterviewService interviewService;
 
     @PostMapping("/{userId}/availability")
     public ResponseEntity<Void> setSlotsForAvailability(@PathVariable Integer userId,
@@ -38,6 +42,34 @@ public class InterviewController {
     public ResponseEntity<List<TimeSlot>> getSlotsOfAvailability(@PathVariable Integer userId) throws ResourceNotFoundException {
         List<TimeSlot> slotDtoList = slotService.getSlotsForAvailability(userId);
         return new ResponseEntity<>(slotDtoList, HttpStatus.OK);
+    }
+
+    //upcoming interviews for interviewer
+    @GetMapping("/{userId}/interviewer/upcoming")
+    public ResponseEntity<List<MyInterviewDto>> getUpcomingInterviewForInterviewer(@PathVariable Integer userId) throws ResourceNotFoundException {
+        List<MyInterviewDto> myInterviewDtoList = interviewService.getUpcomingInterviewForInterviewer(userId);
+        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+    }
+
+    //upcoming interviews for interviewee
+    @GetMapping("/{userId}/interviewee/upcoming")
+    public ResponseEntity<List<MyInterviewDto>> getUpcomingInterviewForInterviewee(@PathVariable Integer userId) throws ResourceNotFoundException {
+        List<MyInterviewDto> myInterviewDtoList = interviewService.getUpcomingInterviewForInterviewee(userId);
+        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+    }
+
+    //Past Interviews for Interviewer
+    @GetMapping("/{userId}/interviewer/completed")
+    public ResponseEntity<List<MyInterviewDto>> getCompletedInterviewForInterviewer(@PathVariable Integer userId) throws ResourceNotFoundException {
+        List<MyInterviewDto> myInterviewDtoList = interviewService.getCompletedInterviewForInterviewer(userId);
+        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+    }
+
+    //Past Interviews for Interviewee
+    @GetMapping("/{userId}/interviewee/completed")
+    public ResponseEntity<List<MyInterviewDto>> getCompletedInterviewForInterviewee(@PathVariable Integer userId) throws ResourceNotFoundException {
+        List<MyInterviewDto> myInterviewDtoList = interviewService.getCompletedInterviewForInterviewee(userId);
+        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
     }
 
     @PostMapping("/{userId}/slots/{slotId}")
