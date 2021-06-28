@@ -1,6 +1,5 @@
 package com.hashedin.mockview.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hashedin.mockview.model.SlotStatus;
 import lombok.*;
