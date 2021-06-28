@@ -1,9 +1,6 @@
 package com.hashedin.mockview.service;
 
-import com.hashedin.mockview.dto.InterviewerDto;
 import com.hashedin.mockview.dto.MyInterviewDto;
-import com.hashedin.mockview.dto.TimeSlot;
-import com.hashedin.mockview.exception.BadRequestException;
 import com.hashedin.mockview.exception.ResourceNotFoundException;
 import com.hashedin.mockview.model.Slot;
 import com.hashedin.mockview.model.SlotStatus;
@@ -16,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -40,12 +38,36 @@ public class InterviewService {
     private final java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 
 
+    private LocalTime getCurrentTimeIST()
+    {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        ZoneId zone1 = ZoneId.of("Asia/Kolkata");
+        LocalTime time1 = LocalTime.now(zone1);
+        return LocalTime.parse(formatter.format(time1));
+    }
+
+
     public List<MyInterviewDto> getUpcomingInterviewForInterviewer(Integer id) throws ResourceNotFoundException {
 
 
         User loggedInUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
-        List<Slot> slotList = slotRepository.findByInterviewerAndSlotStatusAndInterviewDateGreaterThanEqual(loggedInUser, SlotStatus.BOOKED, currentDate);
+
+
+        LocalTime currentTime =getCurrentTimeIST();
+        List<Slot> slotListFromRepo = slotRepository.findByInterviewerAndSlotStatusAndInterviewDateGreaterThanEqual(loggedInUser, SlotStatus.BOOKED, currentDate);
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Slot> slotList =new ArrayList<>();
+        for(Slot slot :slotListFromRepo)
+        {
+            if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().compareTo(currentTime)>0 )
+                slotList.add(slot);
+            else if(slot.getInterviewDate().compareTo(currentDate)>0)
+                slotList.add(slot);
+        }
         log.debug("Data returned by query is {}", slotList);
 
         Set idList = slotList.stream()
@@ -98,7 +120,20 @@ public class InterviewService {
 
         User loggedInUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
-        List<Slot> slotList = slotRepository.findByIntervieweeAndSlotStatusAndInterviewDateGreaterThanEqual(loggedInUser, SlotStatus.BOOKED, currentDate);
+        LocalTime currentTime =getCurrentTimeIST();
+        List<Slot> slotListFromRepo = slotRepository.findByIntervieweeAndSlotStatusAndInterviewDateGreaterThanEqual(loggedInUser, SlotStatus.BOOKED, currentDate);
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Slot> slotList =new ArrayList<>();
+        for(Slot slot :slotListFromRepo)
+        {
+            if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().compareTo(currentTime)>0 )
+                slotList.add(slot);
+            else if(slot.getInterviewDate().compareTo(currentDate)>0)
+                slotList.add(slot);
+        }
         log.debug("Data returned by query is {}", slotList);
 
         Set idList = slotList.stream()
@@ -150,10 +185,21 @@ public class InterviewService {
     public List<MyInterviewDto> getCompletedInterviewForInterviewer(Integer id) throws ResourceNotFoundException {
         User loggedInUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+        LocalTime currentTime = getCurrentTimeIST();
         List<SlotStatus> slotStatusList = Arrays.asList(SlotStatus.COMPLETED,SlotStatus.BOOKED);
-        List<Slot> slotListCompleted = slotRepository.findByInterviewerAndSlotStatusInAndInterviewDateLessThan(loggedInUser, slotStatusList, currentDate);
+        List<Slot> slotListFromRepo = slotRepository.findByInterviewerAndSlotStatusInAndInterviewDateLessThanEqual(loggedInUser, slotStatusList, currentDate);
 
-        // currently not handled time logic
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Slot> slotListCompleted =new ArrayList<>();
+        for(Slot slot :slotListFromRepo)
+        {
+            if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().plusHours(1).compareTo(currentTime) < 0 )
+                slotListCompleted.add(slot);
+            else if(slot.getInterviewDate().compareTo(currentDate)<0)
+                slotListCompleted.add(slot);
+        }
 
         // making all previous slots less than current date as completed
         slotListCompleted.stream().forEach(x ->
@@ -218,11 +264,23 @@ public class InterviewService {
 
         User loggedInUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for id : " + id));
+        LocalTime currentTime =getCurrentTimeIST();
         List<SlotStatus> slotStatusList = Arrays.asList(SlotStatus.COMPLETED,SlotStatus.BOOKED);
-        List<Slot> slotListCompleted = slotRepository.findByIntervieweeAndSlotStatusInAndInterviewDateLessThan(loggedInUser, slotStatusList, currentDate);
+        List<Slot> slotListFromRepo = slotRepository.findByIntervieweeAndSlotStatusInAndInterviewDateLessThanEqual(loggedInUser, slotStatusList, currentDate);
+
 
         // currently not handled time logic
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+        List<Slot> slotListCompleted =new ArrayList<>();
+        for(Slot slot :slotListFromRepo)
+        {
+            if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().plusHours(1).compareTo(currentTime) < 0 )
+                slotListCompleted.add(slot);
+            else if(slot.getInterviewDate().compareTo(currentDate)<0)
+                slotListCompleted.add(slot);
+        }
         // making all previous slots less than current date as completed
         slotListCompleted.stream().forEach(x ->
                 {

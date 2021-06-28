@@ -48,28 +48,28 @@ public class InterviewController {
     @GetMapping("/{userId}/interviewer/upcoming")
     public ResponseEntity<List<MyInterviewDto>> getUpcomingInterviewForInterviewer(@PathVariable Integer userId) throws ResourceNotFoundException {
         List<MyInterviewDto> myInterviewDtoList = interviewService.getUpcomingInterviewForInterviewer(userId);
-        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+        return new ResponseEntity<>(myInterviewDtoList, HttpStatus.OK);
     }
 
     //upcoming interviews for interviewee
     @GetMapping("/{userId}/interviewee/upcoming")
     public ResponseEntity<List<MyInterviewDto>> getUpcomingInterviewForInterviewee(@PathVariable Integer userId) throws ResourceNotFoundException {
         List<MyInterviewDto> myInterviewDtoList = interviewService.getUpcomingInterviewForInterviewee(userId);
-        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+        return new ResponseEntity<>(myInterviewDtoList, HttpStatus.OK);
     }
 
     //Past Interviews for Interviewer
     @GetMapping("/{userId}/interviewer/completed")
     public ResponseEntity<List<MyInterviewDto>> getCompletedInterviewForInterviewer(@PathVariable Integer userId) throws ResourceNotFoundException {
         List<MyInterviewDto> myInterviewDtoList = interviewService.getCompletedInterviewForInterviewer(userId);
-        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+        return new ResponseEntity<>(myInterviewDtoList, HttpStatus.OK);
     }
 
     //Past Interviews for Interviewee
     @GetMapping("/{userId}/interviewee/completed")
     public ResponseEntity<List<MyInterviewDto>> getCompletedInterviewForInterviewee(@PathVariable Integer userId) throws ResourceNotFoundException {
         List<MyInterviewDto> myInterviewDtoList = interviewService.getCompletedInterviewForInterviewee(userId);
-        return new ResponseEntity<>(myInterviewDtoList,HttpStatus.OK);
+        return new ResponseEntity<>(myInterviewDtoList, HttpStatus.OK);
     }
 
     @PostMapping("/{userId}/slots/{slotId}")
@@ -96,10 +96,11 @@ public class InterviewController {
             convertedEndTime = LocalTime.parse(endTime);
         }
 
-        if (company ==null || company.equals(""))
+        if (company == null || company.equals(""))
             company = null;
 
         List<InterviewerDto> interviewerDtoList = slotService.findInterviewers(userId, industry, date, company, position, convertedStartTime, convertedEndTime);
+
 
 
         return new ResponseEntity<>(interviewerDtoList, HttpStatus.OK);
