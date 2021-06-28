@@ -78,7 +78,9 @@ public class InterviewService {
         List<UserWorkExperience> userWorkExperienceList = userWorkExperienceRepository.findByUserIn(userList);
 
 
+
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -157,6 +159,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -244,6 +247,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();
@@ -334,6 +338,7 @@ public class InterviewService {
 
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         HashMap<User, UserWorkExperience> currentCompanyMap = new HashMap<>();

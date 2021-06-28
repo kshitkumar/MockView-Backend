@@ -104,6 +104,7 @@ public class SlotService {
         // creating Map for certain fields
 
         Map<User, List<UserWorkExperience>> userWorkExperienceMap = userWorkExperienceList.stream()
+                .filter(x ->x!=null)
                 .collect(Collectors.groupingBy(UserWorkExperience::getUser));
 
         Map<User, Double> experienceMap = new HashMap<>();
