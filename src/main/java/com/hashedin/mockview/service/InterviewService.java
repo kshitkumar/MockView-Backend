@@ -182,7 +182,7 @@ public class InterviewService {
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
 
-            Object company = currentCompanyMap.get(slot.getInterviewee());
+            Object company = currentCompanyMap.get(slot.getInterviewer());
             if(company==null)
             {
                 myInterviewDto.setCompany(null);
@@ -190,8 +190,8 @@ public class InterviewService {
             }
             else
             {
-                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
-                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
             }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
@@ -362,7 +362,7 @@ public class InterviewService {
             myInterviewDto.setId(slot.getId());
             myInterviewDto.setName(slot.getInterviewer().getFirstName() + " " + slot.getInterviewer().getLastName());
 
-            Object company = currentCompanyMap.get(slot.getInterviewee());
+            Object company = currentCompanyMap.get(slot.getInterviewer());
             if(company==null)
             {
                 myInterviewDto.setCompany(null);
@@ -370,8 +370,8 @@ public class InterviewService {
             }
             else
             {
-                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewee()).getPosition());
-                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewee()).getCompanyName());
+                myInterviewDto.setPosition(currentCompanyMap.get(slot.getInterviewer()).getPosition());
+                myInterviewDto.setCompany(currentCompanyMap.get(slot.getInterviewer()).getCompanyName());
             }
             myInterviewDto.setStartDate(slot.getInterviewDate());
             myInterviewDto.setStartTime(slot.getInterviewStartTime());
