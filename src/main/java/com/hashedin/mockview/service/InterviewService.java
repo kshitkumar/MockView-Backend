@@ -65,7 +65,7 @@ public class InterviewService {
         {
             if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().compareTo(currentTime)>0 )
                 slotList.add(slot);
-            else if(slot.getInterviewDate().compareTo(currentDate)>0)
+            else if((sdf.format(slot.getInterviewDate()).compareTo(sdf.format(currentDate))>0))
                 slotList.add(slot);
         }
         log.debug("Data returned by query is {}", slotList);
@@ -145,7 +145,7 @@ public class InterviewService {
         {
             if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().compareTo(currentTime)>0 )
                 slotList.add(slot);
-            else if(slot.getInterviewDate().compareTo(currentDate)>0)
+            else if((sdf.format(slot.getInterviewDate()).compareTo(sdf.format(currentDate))>0))
                 slotList.add(slot);
         }
         log.debug("Data returned by query is {}", slotList);
@@ -222,7 +222,7 @@ public class InterviewService {
         {
             if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().plusHours(1).compareTo(currentTime) < 0 )
                 slotListCompleted.add(slot);
-            else if(slot.getInterviewDate().compareTo(currentDate)<0)
+            else if((sdf.format(slot.getInterviewDate()).compareTo(sdf.format(currentDate))<0))
                 slotListCompleted.add(slot);
         }
 
@@ -314,7 +314,7 @@ public class InterviewService {
         {
             if(sdf.format(slot.getInterviewDate()).equals(sdf.format(currentDate))  && slot.getInterviewStartTime().plusHours(1).compareTo(currentTime) < 0 )
                 slotListCompleted.add(slot);
-            else if(slot.getInterviewDate().compareTo(currentDate)<0)
+            else if((sdf.format(slot.getInterviewDate()).compareTo(sdf.format(currentDate))<0))
                 slotListCompleted.add(slot);
         }
         // making all previous slots less than current date as completed
