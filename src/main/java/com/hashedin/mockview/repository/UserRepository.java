@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
     void updatePassword(String newBcryptPassword, Integer id);
 
     List<User> findByIdIn(Set idList);
+
+    User findByEmailIdOrPhoneNumber(String emailId, String phoneNumber);
 }
