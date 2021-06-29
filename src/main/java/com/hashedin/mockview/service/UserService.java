@@ -39,9 +39,9 @@ public class UserService {
 
     public User userSignUp(User inputUser) throws DuplicateResourceException {
 
-        User userFound = userRepository.findByEmailId(inputUser.getEmailId());
+        User userFound = userRepository.findByEmailIdOrPhoneNumber(inputUser.getEmailId(),inputUser.getPhoneNumber());
         if (userFound != null)
-            throw new DuplicateResourceException("User already exists for mailId " + inputUser.getEmailId());
+            throw new DuplicateResourceException("User already exists");
         User user = User.builder()
                 .dateOfBirth(inputUser.getDateOfBirth())
                 .emailId(inputUser.getEmailId())
